@@ -30,6 +30,14 @@ function childFigure(cx,cy,scale=1,color="#111"){
     <path d="M0 -10 L0 6 M-8 -2 L0 -4 L8 -2 M0 6 L-7 20 M0 6 L7 20" stroke="${color}" stroke-width="5" fill="none" stroke-linecap="round"/>
   </g>`;
 }
+function palmTree(cx,cy,scale=1,color="#111"){
+  return `<g transform="translate(${cx} ${cy}) scale(${scale})">
+    <path d="M0 30 Q-5 8 3 -10" stroke="${color}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+    <path d="M3 -10 Q-16 -12 -25 -2" stroke="${color}" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M3 -10 Q-12 -22 -22 -20" stroke="${color}" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M3 -10 Q4 -24 -6 -30" stroke="${color}" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  </g>`;
+}
 function bikeFigure(cx,cy,scale=1,color="#111"){
   return `<g transform="translate(${cx} ${cy}) scale(${scale})">
     <circle cx="-16" cy="10" r="11" fill="none" stroke="${color}" stroke-width="5"/>
@@ -79,6 +87,7 @@ const ICONS = {
   "airplane": (c)=>`<path d="M15 55 L85 50 L70 42 M15 55 L70 60 M45 45 L38 20 L48 25 L52 45 M45 62 L38 85 L48 80 L52 62" fill="${c}" stroke="${c}" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>`,
   "firetruck": (c)=>`<rect x="18" y="40" width="50" height="24" rx="3" fill="${c}"/><rect x="68" y="46" width="16" height="18" rx="2" fill="${c}"/><circle cx="32" cy="66" r="7" fill="${c}"/><circle cx="66" cy="66" r="7" fill="${c}"/><path d="M28 40 v-12 h14 v12" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`,
   "windsock": (c)=>`<path d="M20 25 V80" stroke="${c}" stroke-width="6" stroke-linecap="round"/><path d="M20 30 L70 22 Q58 34 70 46 L20 40 Z" fill="${c}"/>`,
+  "crosswind": (c)=>`${palmTree(30,58,1,c)}${palmTree(20,44,0.7,c)}<path d="M38 80 L72 26 L86 26 L52 84 Z" fill="${c}"/><path d="M50 68 L62 49" stroke="#fff" stroke-width="3" stroke-dasharray="5 4"/>`,
   "roundabout": (c)=>`<circle cx="50" cy="50" r="22" fill="none" stroke="${c}" stroke-width="8"/><path d="M70 38 a22 22 0 0 0-14-14" fill="none" stroke="${c}" stroke-width="8" stroke-linecap="round"/><path d="M70 38 L58 36 M70 38 L64 48" stroke="${c}" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
   "road-end": (c)=>`<path d="M50 20 V60" stroke="${c}" stroke-width="9" stroke-linecap="round"/><path d="M22 60 H78" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`,
   "headlight": (c)=>`<path d="M25 50 h20 l20-16 v32 l-20-16" fill="none" stroke="${c}" stroke-width="6" stroke-linejoin="round"/><path d="M70 38 h14 M70 50 h18 M70 62 h14" stroke="${c}" stroke-width="6" stroke-linecap="round"/>`,
@@ -143,11 +152,12 @@ function frameRectSpecial(content, big=false){
 // code -> {frame, icon, extra}
 const SIGN_DB = {
   "R-6": {frame:"proh", icon:"no-left-turn"},
-  "R-3": {frame:"mand", icon:"arrow-up"},
+  "R-3": {frame:"proh", icon:"arrow-up"},
   "R-53": {frame:"proh", icon:"cross"},
   "R-29": {frame:"proh", icon:"horn-slash"},
   "P-22C": {frame:"prev", icon:"merge-lines"},
-  "P-1A": {frame:"prev", icon:"curve-soft-right"},
+  "P-1A": {frame:"prev", icon:"curve-sharp-right"},
+  "P-2A": {frame:"prev", icon:"curve-soft-right"},
   "R-30F": {frame:"speed", num:"40"},
   "P-17A": {frame:"prev", icon:"road-end", label:"angosto"},
   "P-33A": {frame:"prev", icon:"bump"},
@@ -190,7 +200,7 @@ const SIGN_DB = {
   "P-45": {frame:"prev", icon:"airplane"},
   "P-52": {frame:"prev", icon:"firetruck"},
   "P-66": {frame:"prev", icon:"windsock"},
-  "P-66A": {frame:"prev", icon:"windsock"},
+  "P-66A": {frame:"prev", icon:"crosswind"},
   "I-14": {frame:"info", icon:"hospital-h"},
   "I-31": {frame:"info", icon:"letter-E"},
   "I-9": {frame:"info", icon:"guard"},
