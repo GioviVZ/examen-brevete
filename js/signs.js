@@ -202,7 +202,12 @@ const SIGN_DB = {
   "P-31A": {frame:"prev", icon:"road-end"},
 };
 
-function renderSign(code, big=false){
+// Códigos para los que el balotario original NO imprime un ícono (solo se
+// nombra la señal en el texto de la pregunta) -> no hay imagen real que extraer,
+// se usa el dibujo esquemático como apoyo visual.
+const NO_SOURCE_IMAGE = new Set(["R-6"]);
+
+function renderSignSVG(code, big=false){
   const d = SIGN_DB[code];
   if (!d) return `<div class="sign-fallback">${code}</div>`;
   if (d.frame === "prev") return frameDiamond(ICONS[d.icon], big);
@@ -219,6 +224,21 @@ function renderSign(code, big=false){
     return frameRectSpecial(inner+textEl+sub, big);
   }
   return `<div class="sign-fallback">${code}</div>`;
+}
+
+// Si la imagen real no carga (archivo faltante, ruta rota), reemplaza por el dibujo esquemático.
+function handleSignImgError(imgEl, code, big){
+  const wrap = document.createElement("span");
+  wrap.innerHTML = renderSignSVG(code, big);
+  imgEl.replaceWith(wrap.firstElementChild);
+}
+
+// Imagen real recortada del balotario oficial del MTC. Si no existe (NO_SOURCE_IMAGE),
+// cae al dibujo esquemático como respaldo.
+function renderSign(code, big=false){
+  if (NO_SOURCE_IMAGE.has(code)) return renderSignSVG(code, big);
+  const h = big ? 128 : 100;
+  return `<img class="sign-img" src="assets/signs/${encodeURIComponent(code)}.png" alt="Señal ${code}" style="height:${h}px" loading="lazy" onerror="handleSignImgError(this,'${code}',${big})">`;
 }
 
 // ---- Diagramas de escena (para preguntas con gráfico, no señal) ----
@@ -304,9 +324,21 @@ const DIAGRAMS = {
   `),
 };
 
-function renderDiagram(key, big=false){
+function renderDiagramSVG(key, big=false){
   const f = DIAGRAMS[key];
   return f ? f(big) : `<div class="sign-fallback">${key}</div>`;
+}
+
+function handleDiagramImgError(imgEl, key, big){
+  const wrap = document.createElement("span");
+  wrap.innerHTML = renderDiagramSVG(key, big);
+  imgEl.replaceWith(wrap.firstElementChild);
+}
+
+// Escena real recortada del balotario oficial del MTC (con respaldo esquemático si falla la carga).
+function renderDiagram(key, big=false){
+  const w = big ? 320 : 260;
+  return `<img class="sign-img diagram-img" src="assets/diagrams/${encodeURIComponent(key)}.png" alt="Diagrama" style="max-width:${w}px" loading="lazy" onerror="handleDiagramImgError(this,'${key}',${big})">`;
 }
 
 if (typeof module !== "undefined") module.exports = { renderSign, renderDiagram, SIGN_DB };

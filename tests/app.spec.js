@@ -59,15 +59,43 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
     await expect(page.locator('.score-circle span')).toHaveText(/\d+\/10/);
   });
 
-  test('el ícono de señal se renderiza (SVG) cuando la pregunta tiene una señal asociada', async ({ page }) => {
+  test('el ícono de señal (imagen real o SVG de respaldo) se renderiza cuando la pregunta tiene una señal asociada', async ({ page }) => {
     await page.goto('/index.html');
     await page.click('[data-nav="study-setup"]');
     await page.click('.chip-group[data-group="filter"] .chip[data-val="senales"]');
     await page.click('.chip-group[data-group="count"] .chip[data-val="10"]');
     await page.click('[data-action="start-study"]');
 
-    // En modo "solo señales" cada pregunta debe traer un sign-box con un <svg>
-    await expect(page.locator('.sign-box svg')).toBeVisible();
+    // En modo "solo señales" cada pregunta debe traer un sign-box con una imagen real
+    // (assets/signs|diagrams/*.png) o, si no existe imagen fuente (ej. R-6), un <svg> de respaldo.
+    const media = page.locator('.sign-box img.sign-img, .sign-box svg');
+    await expect(media).toBeVisible();
+  });
+
+  test('las imágenes de señales extraídas del balotario cargan correctamente (sin 404)', async ({ page }) => {
+    await page.goto('/index.html');
+    await page.click('[data-nav="study-setup"]');
+    await page.click('.chip-group[data-group="filter"] .chip[data-val="senales"]');
+    await page.click('.chip-group[data-group="count"] .chip[data-val="40"]');
+    await page.click('[data-action="start-study"]');
+
+    const failedImgSrcs = [];
+    for (let i = 0; i < 40; i++) {
+      const img = page.locator('.sign-box img.sign-img');
+      if (await img.count()) {
+        // espera a que termine de cargar (o falle) antes de leer naturalWidth
+        const { src, ok } = await img.evaluate(el => new Promise(resolve => {
+          const finish = () => resolve({ src: el.src, ok: el.naturalWidth > 0 });
+          if (el.complete) return finish();
+          el.addEventListener('load', finish, { once: true });
+          el.addEventListener('error', finish, { once: true });
+        }));
+        if (!ok) failedImgSrcs.push(src);
+      }
+      await page.locator('.opt-btn').first().click();
+      if (i < 39) await page.click('[data-action="next-question"]');
+    }
+    expect(failedImgSrcs, `Imágenes que no cargaron: ${failedImgSrcs.join(', ')}`).toEqual([]);
   });
 
   test('simulacro de examen: 40 preguntas, navegador funcional, resultados con aprobado/no aprobado', async ({ page }) => {

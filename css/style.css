@@ -136,6 +136,11 @@ button{font-family:inherit; cursor:pointer;}
 .sign-box{display:flex; flex-direction:column; align-items:center; gap:6px; margin-bottom:16px;}
 .sign-code{font-size:12px; color:var(--muted); font-weight:700; letter-spacing:.03em;}
 .sign-fallback{padding:14px; background:var(--bg); border-radius:10px; font-weight:700;}
+.sign-img{
+  display:block; max-width:100%; width:auto; background:#fff; padding:10px;
+  border-radius:12px; border:1px solid var(--border); box-shadow:var(--shadow);
+}
+.diagram-img{padding:6px; height:auto;}
 .q-text{margin:0 0 18px; font-size:18px; line-height:1.4;}
 .options{display:flex; flex-direction:column; gap:10px;}
 .opt-btn{
