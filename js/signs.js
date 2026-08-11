@@ -56,7 +56,7 @@ const ICONS = {
   "cross": (c)=>`<path d="M32 32 L68 68 M68 32 L32 68" stroke="${SIGN_COLORS.red}" stroke-width="10" stroke-linecap="round"/>`,
   "horn-slash": (c)=>`<path d="M30 42 h14 l16-14 v44 l-16-14 h-14 z" fill="${c}"/><path d="M64 40 q8 10 0 20" stroke="${c}" stroke-width="5" fill="none" stroke-linecap="round"/>`,
   "car-silhouette": (c)=>`<path d="M22 60 q2-16 12-18 h32 q10 2 12 18 z" fill="${c}"/><circle cx="32" cy="62" r="6" fill="#fff"/><circle cx="68" cy="62" r="6" fill="#fff"/>`,
-  "do-not-enter-bar": ()=>`<rect x="24" y="43" width="52" height="14" rx="2" fill="#fff"/>`,
+  "do-not-enter-bar": (c)=>`<rect x="20" y="44" width="60" height="12" rx="2" fill="${c}"/><text x="50" y="38" font-size="15" font-weight="800" fill="${c}" text-anchor="middle" font-family="Arial">NO</text><text x="50" y="72" font-size="13" font-weight="800" fill="${c}" text-anchor="middle" font-family="Arial">ENTRE</text>`,
   "merge-lines": (c)=>`<path d="M30 75 L55 30 M70 75 L55 30" stroke="${c}" stroke-width="7" fill="none" stroke-linecap="round"/>${arrow(55,30,10,-90,7,c)}`,
   "curve-soft-right": (c)=>`<path d="M25 75 Q45 75 45 50 Q45 25 75 25" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round"/>${arrow(75,25,0,0,0,c)}<path d="M75 25 L62 22 M75 25 L67 36" stroke="${c}" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
   "curve-sharp-right": (c)=>`<path d="M22 78 Q30 30 78 22" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round"/><path d="M78 22 L65 20 M78 22 L72 33" stroke="${c}" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
@@ -66,7 +66,6 @@ const ICONS = {
   "dip": (c)=>`<path d="M15 40 Q30 40 35 60 Q45 82 55 60 Q60 40 85 40" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round"/>`,
   "bump": (c)=>`<path d="M15 62 Q50 62 50 34 Q50 62 85 62" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round"/>`,
   "slippery": (c)=>`<path d="M25 35 q20-14 40 0 q10 8 10 20 q0 15-15 20" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"/><path d="M20 68 q8-6 16 0 q8 6 16 0 q8-6 16 0 q8 6 16 0" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`,
-  "two-cars-slash": (c)=>`<rect x="18" y="55" width="26" height="16" rx="3" fill="${c}"/><rect x="52" y="30" width="26" height="16" rx="3" fill="${c}"/><path d="M20 78 L80 20" stroke="${SIGN_COLORS.red}" stroke-width="7" stroke-linecap="round"/>`,
   "bicycle": (c)=>bikeFigure(50,48,0.75,c),
   "bicycle-down": (c)=>bikeFigure(45,40,0.62,c)+arrow(78,72,14,90,7,c),
   "bicycle-diag": (c)=>bikeFigure(42,38,0.6,c)+arrow(76,70,14,55,7,c),
@@ -87,9 +86,11 @@ const ICONS = {
   "airplane": (c)=>`<path d="M15 55 L85 50 L70 42 M15 55 L70 60 M45 45 L38 20 L48 25 L52 45 M45 62 L38 85 L48 80 L52 62" fill="${c}" stroke="${c}" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>`,
   "firetruck": (c)=>`<rect x="18" y="40" width="50" height="24" rx="3" fill="${c}"/><rect x="68" y="46" width="16" height="18" rx="2" fill="${c}"/><circle cx="32" cy="66" r="7" fill="${c}"/><circle cx="66" cy="66" r="7" fill="${c}"/><path d="M28 40 v-12 h14 v12" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`,
   "windsock": (c)=>`<path d="M20 25 V80" stroke="${c}" stroke-width="6" stroke-linecap="round"/><path d="M20 30 L70 22 Q58 34 70 46 L20 40 Z" fill="${c}"/>`,
+  "windswept-palm": (c)=>`${palmTree(45,62,1.3,c)}<path d="M62 30 Q78 28 88 24" stroke="${c}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M60 38 Q76 36 90 34" stroke="${c}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M58 46 Q74 46 86 46" stroke="${c}" stroke-width="3" fill="none" stroke-linecap="round"/>`,
   "crosswind": (c)=>`${palmTree(30,58,1,c)}${palmTree(20,44,0.7,c)}<path d="M38 80 L72 26 L86 26 L52 84 Z" fill="${c}"/><path d="M50 68 L62 49" stroke="#fff" stroke-width="3" stroke-dasharray="5 4"/>`,
   "roundabout": (c)=>`<circle cx="50" cy="50" r="22" fill="none" stroke="${c}" stroke-width="8"/><path d="M70 38 a22 22 0 0 0-14-14" fill="none" stroke="${c}" stroke-width="8" stroke-linecap="round"/><path d="M70 38 L58 36 M70 38 L64 48" stroke="${c}" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
   "road-end": (c)=>`<path d="M50 20 V60" stroke="${c}" stroke-width="9" stroke-linecap="round"/><path d="M22 60 H78" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`,
+  "lane-narrows": (c)=>`<path d="M32 20 Q40 40 50 50 Q40 60 32 80" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round"/><path d="M68 20 Q60 40 50 50 Q60 60 68 80" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`,
   "headlight": (c)=>`<path d="M25 50 h20 l20-16 v32 l-20-16" fill="none" stroke="${c}" stroke-width="6" stroke-linejoin="round"/><path d="M70 38 h14 M70 50 h18 M70 62 h14" stroke="${c}" stroke-width="6" stroke-linecap="round"/>`,
   "two-cars-gap": (c)=>`<rect x="20" y="58" width="24" height="15" rx="3" fill="${c}"/><rect x="56" y="58" width="24" height="15" rx="3" fill="${c}"/><path d="M46 65 h8" stroke="${c}" stroke-width="4"/>`,
   "truck-box": (c)=>`<rect x="18" y="34" width="40" height="30" rx="2" fill="${c}"/><rect x="58" y="44" width="20" height="20" rx="2" fill="${c}"/><circle cx="32" cy="68" r="6" fill="${c}"/><circle cx="68" cy="68" r="6" fill="${c}"/>`,
@@ -103,7 +104,8 @@ const ICONS = {
   "letter-E": (c)=>`<text x="50" y="66" font-size="42" font-weight="700" fill="${c}" text-anchor="middle" font-family="Arial">E</text>`,
   "chain": (c)=>`<circle cx="50" cy="50" r="26" fill="none" stroke="${c}" stroke-width="9"/><path d="M32 40 L68 40 M32 50 L68 50 M32 60 L68 60" stroke="${c}" stroke-width="4"/>`,
   "solo-left": (c)=>arrow(45,50,24,180,10,c),
-  "opposing-arrows": (c)=>arrow(38,50,22,-90,9,SIGN_COLORS.white)+arrow(62,50,22,90,9,SIGN_COLORS.white),
+  "opposing-arrows": (c)=>arrow(38,50,22,-90,9,c)+arrow(62,50,22,90,9,c),
+  "end-restriction": (c)=>`<path d="M25 30 L75 70 M35 22 L85 62 M15 38 L65 78" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`,
 };
 
 function frameDiamond(inner, big=false){
@@ -113,6 +115,14 @@ function frameDiamond(inner, big=false){
     <g>${inner("#111")}</g>
   </svg>`;
 }
+function frameTriangleText(text, big=false){
+  const s = big?110:96;
+  return `<svg viewBox="0 0 100 100" width="${s}" height="${s}">
+    <polygon points="10,10 90,50 10,90" fill="${SIGN_COLORS.yellow}" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+    <text x="30" y="44" font-size="12" font-weight="800" fill="#111" text-anchor="middle" font-family="Arial">${text[0]}</text>
+    <text x="30" y="58" font-size="8.5" font-weight="800" fill="#111" text-anchor="middle" font-family="Arial">${text[1]||""}</text>
+  </svg>`;
+}
 function frameCirclePro(inner, big=false){
   const s = big?110:96;
   return `<svg viewBox="0 0 100 100" width="${s}" height="${s}">
@@ -120,10 +130,10 @@ function frameCirclePro(inner, big=false){
     <g>${inner("#111")}</g>
   </svg>`;
 }
-function frameCircleMand(inner, big=false){
+function frameCircleFilled(inner, big=false, fillColor=SIGN_COLORS.red){
   const s = big?110:96;
   return `<svg viewBox="0 0 100 100" width="${s}" height="${s}">
-    <circle cx="50" cy="50" r="44" fill="${SIGN_COLORS.blue}" stroke="#fff" stroke-width="3"/>
+    <circle cx="50" cy="50" r="44" fill="${fillColor}" stroke="#fff" stroke-width="3"/>
     <g>${inner("#fff")}</g>
   </svg>`;
 }
@@ -144,7 +154,7 @@ function frameSpeed(num, big=false){
 function frameRectSpecial(content, big=false){
   const w = big?150:130, h = big?110:96;
   return `<svg viewBox="0 0 130 100" width="${w}" height="${h}">
-    <rect x="4" y="4" width="122" height="92" rx="8" fill="${SIGN_COLORS.blue}" stroke="#fff" stroke-width="2"/>
+    <rect x="4" y="4" width="122" height="92" rx="8" fill="#fff" stroke="#111" stroke-width="3"/>
     ${content}
   </svg>`;
 }
@@ -159,28 +169,28 @@ const SIGN_DB = {
   "P-1A": {frame:"prev", icon:"curve-sharp-right"},
   "P-2A": {frame:"prev", icon:"curve-soft-right"},
   "R-30F": {frame:"speed", num:"40"},
-  "P-17A": {frame:"prev", icon:"road-end", label:"angosto"},
+  "P-17A": {frame:"prev", icon:"lane-narrows"},
   "P-33A": {frame:"prev", icon:"bump"},
   "R-17": {frame:"proh", icon:"car-silhouette"},
-  "R-4": {frame:"proh", icon:"do-not-enter-bar"},
+  "R-4": {frame:"mand", icon:"do-not-enter-bar"},
   "P-36": {frame:"prev", icon:"slippery"},
-  "R-14": {frame:"mand", icon:"curve-soft-right"},
-  "R-11A": {frame:"mand", icon:"three-arrows"},
+  "R-14": {frame:"proh", icon:"arrow-right"},
+  "R-11A": {frame:"proh", icon:"three-arrows"},
   "R-30C": {frame:"speed", num:"50", label:"SALIDA"},
   "R-5-4": {frame:"rect", icon:"fork-arrow", text:"SOLO"},
-  "R-9": {frame:"mand", icon:"u-turn"},
+  "R-9": {frame:"proh", icon:"u-turn"},
   "R-5-2": {frame:"rect", icon:"fork-arrow", text:""},
-  "R-20": {frame:"mand", icon:"pedestrian-priority"},
-  "R-40": {frame:"mand", icon:"headlight"},
+  "R-20": {frame:"proh", icon:"pedestrian-priority"},
+  "R-40": {frame:"proh", icon:"headlight"},
   "R-48": {frame:"info", icon:"truck-box"},
-  "R-49": {frame:"mand", icon:"two-cars-gap"},
-  "R-50": {frame:"rect", icon:"opposing-arrows", text:"PREFERENCIA AL SENTIDO CONTRARIO", small:true},
+  "R-49": {frame:"proh", icon:"two-cars-gap"},
+  "R-50": {frame:"rect", icon:"opposing-arrows", circle:"red", text:"PREFERENCIA AL SENTIDO CONTRARIO", small:true},
   "R-5-1": {frame:"rect", icon:"solo-left", text:"SOLO"},
   "P-3A": {frame:"prev", icon:"s-curve-right"},
   "P-5-1A": {frame:"prev", icon:"winding-left"},
   "P-61": {frame:"prev", icon:"chevron-curve"},
   "P-34": {frame:"prev", icon:"dip"},
-  "P-60": {frame:"prev", icon:"two-cars-slash"},
+  "P-60": {frame:"triText", text:["NO","ADELANTAR"]},
   "P-46": {frame:"prev", icon:"bicycle"},
   "P-46A": {frame:"prev", icon:"bicycle-down"},
   "P-46B": {frame:"prev", icon:"bicycle-diag"},
@@ -199,7 +209,7 @@ const SIGN_DB = {
   "P-41": {frame:"prev", icon:"tunnel"},
   "P-45": {frame:"prev", icon:"airplane"},
   "P-52": {frame:"prev", icon:"firetruck"},
-  "P-66": {frame:"prev", icon:"windsock"},
+  "P-66": {frame:"prev", icon:"windswept-palm"},
   "P-66A": {frame:"prev", icon:"crosswind"},
   "I-14": {frame:"info", icon:"hospital-h"},
   "I-31": {frame:"info", icon:"letter-E"},
@@ -207,7 +217,7 @@ const SIGN_DB = {
   "I-18": {frame:"info", icon:"wrench"},
   "I-19": {frame:"info", icon:"fuel-pump"},
   "I-20": {frame:"info", icon:"chain"},
-  "R-16A": {frame:"rect", icon:null, text:"FIN", sub:"RESTRICCIÓN"},
+  "R-16A": {frame:"rect", icon:"end-restriction", circle:"black", text:"FIN", sub:"RESTRICCIÓN"},
   "P-15": {frame:"prev", icon:"roundabout"},
   "P-31A": {frame:"prev", icon:"road-end"},
 };
@@ -221,17 +231,19 @@ function renderSignSVG(code, big=false){
   const d = SIGN_DB[code];
   if (!d) return `<div class="sign-fallback">${code}</div>`;
   if (d.frame === "prev") return frameDiamond(ICONS[d.icon], big);
+  if (d.frame === "triText") return frameTriangleText(d.text, big);
   if (d.frame === "proh") return frameCirclePro(ICONS[d.icon], big);
-  if (d.frame === "mand") return frameCircleMand(ICONS[d.icon], big);
+  if (d.frame === "mand") return frameCircleFilled(ICONS[d.icon], big);
   if (d.frame === "info") return frameInfo(ICONS[d.icon], big);
   if (d.frame === "speed") return frameSpeed(d.num, big) ;
   if (d.frame === "rect"){
-    const inner = d.icon ? `<g transform="translate(15 0) scale(0.8)">${ICONS[d.icon]("#fff")}</g>` : "";
+    const ring = d.circle ? `<circle cx="65" cy="36" r="26" fill="none" stroke="${d.circle === "red" ? SIGN_COLORS.red : "#111"}" stroke-width="6"/>` : "";
+    const inner = d.icon ? `<g transform="translate(15 -8) scale(0.7)">${ICONS[d.icon]("#111")}</g>` : "";
     const textEl = d.small
-      ? `<text x="65" y="88" font-size="8" font-weight="700" fill="#fff" text-anchor="middle" font-family="Arial">${d.text}</text>`
-      : `<text x="65" y="90" font-size="16" font-weight="800" fill="#fff" text-anchor="middle" font-family="Arial">${d.text||""}</text>`;
-    const sub = d.sub ? `<text x="65" y="70" font-size="10" font-weight="700" fill="#fff" text-anchor="middle" font-family="Arial">${d.sub}</text>` : "";
-    return frameRectSpecial(inner+textEl+sub, big);
+      ? `<text x="65" y="88" font-size="8" font-weight="700" fill="#111" text-anchor="middle" font-family="Arial">${d.text}</text>`
+      : `<text x="65" y="90" font-size="16" font-weight="800" fill="#111" text-anchor="middle" font-family="Arial">${d.text||""}</text>`;
+    const sub = d.sub ? `<text x="65" y="70" font-size="10" font-weight="700" fill="#111" text-anchor="middle" font-family="Arial">${d.sub}</text>` : "";
+    return frameRectSpecial(ring+inner+textEl+sub, big);
   }
   return `<div class="sign-fallback">${code}</div>`;
 }
