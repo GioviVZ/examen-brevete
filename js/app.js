@@ -309,7 +309,7 @@ function viewRunning(){
 }
 
 function questionMedia(q){
-  if (q.sign) return `<div class="sign-box">${renderSign(q.sign, true)}<span class="sign-code">${q.sign}</span></div>`;
+  if (q.sign) return `<div class="sign-box">${renderSign(q.sign, true)}<span class="sign-code">${q.signLabel || q.sign}</span></div>`;
   if (q.diagram) return `<div class="sign-box">${renderDiagram(q.diagram, true)}</div>`;
   return "";
 }
