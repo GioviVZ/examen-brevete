@@ -1,12 +1,40 @@
 (function(){
 "use strict";
 
-const ALL = QUESTIONS;
-const ALL_IDS = ALL.map(q => q.id);
-const byId = {};
-ALL.forEach(q => byId[q.id] = q);
+const CATEGORIES = {
+  "1":  { label: "Categoría I",    sub: "Clase A · Categoría I",    questions: QUESTIONS },
+  "3b": { label: "Categoría III-B", sub: "Clase A · Categoría III-B", questions: QUESTIONS.concat(typeof ESPECIFICAS_3B !== "undefined" ? ESPECIFICAS_3B : []) },
+  "3c": { label: "Categoría III-C", sub: "Clase A · Categoría III-C", questions: QUESTIONS.concat(typeof ESPECIFICAS_3C !== "undefined" ? ESPECIFICAS_3C : []) },
+};
+const CAT_KEY = "brevete_category";
+function loadCategory(){
+  try{ const v = localStorage.getItem(CAT_KEY); return CATEGORIES[v] ? v : "1"; }
+  catch(e){ return "1"; }
+}
+function saveCategory(v){ try{ localStorage.setItem(CAT_KEY, v); }catch(e){} }
+
+let currentCat = loadCategory();
+let ALL, ALL_IDS, byId;
+function rebuildQuestionIndex(){
+  ALL = CATEGORIES[currentCat].questions;
+  ALL_IDS = ALL.map(q => q.id);
+  byId = {};
+  ALL.forEach(q => byId[q.id] = q);
+}
+rebuildQuestionIndex();
 const EXAM_SIZE = 40;
 const PASS_SCORE = 38;
+
+function setCategory(catKey){
+  if (!CATEGORIES[catKey] || catKey === currentCat) return;
+  currentCat = catKey;
+  saveCategory(catKey);
+  rebuildQuestionIndex();
+  session = null;
+  const sub = document.querySelector(".brand-sub");
+  if (sub) sub.textContent = CATEGORIES[currentCat].sub;
+  go("home");
+}
 
 let STATE = loadState();
 let session = null; // sesión activa de estudio/examen/refuerzo
@@ -70,9 +98,15 @@ function viewHome(){
   const dueCount = ALL_IDS.filter(id => isDue(STATE, id)).length;
   const s = computeStats(STATE, ALL);
   return `
+  <div class="cat-switcher">
+    <span class="cat-switcher-label">Categoría de licencia:</span>
+    <div class="chip-group" data-group="category">
+      ${Object.keys(CATEGORIES).map(k => `<button class="chip ${k===currentCat?"active":""}" data-action="set-category" data-arg="${k}">${CATEGORIES[k].label}</button>`).join("")}
+    </div>
+  </div>
   <section class="hero">
     <h1>Prepárate para tu examen de Reglas</h1>
-    <p>Clase A · Categoría I — 40 preguntas, necesitas <strong>${PASS_SCORE}/${EXAM_SIZE}</strong> correctas para aprobar.</p>
+    <p>${CATEGORIES[currentCat].sub} — 40 preguntas, necesitas <strong>${PASS_SCORE}/${EXAM_SIZE}</strong> correctas para aprobar.</p>
     <div class="hero-stats">
       <div class="hero-stat"><span class="big">${s.accuracy}%</span><span>precisión global</span></div>
       <div class="hero-stat"><span class="big">${s.mastered}/${s.total}</span><span>preguntas dominadas</span></div>
@@ -360,6 +394,13 @@ function viewExamRunning(){
   </div>`;
 }
 
+function optionThumb(q, i){
+  return (q.oImg && q.oImg[i]) ? `<img class="opt-thumb" src="${q.oImg[i]}" alt="Opción ${letter(i)}" loading="lazy">` : "";
+}
+function optionLabel(q, i){
+  return `${letter(i)}) ${q.o[i]}`;
+}
+
 function questionCard(q, ans, revealed, mode){
   const options = q.o.map((optText, i) => {
     let cls = "opt-btn";
@@ -372,7 +413,7 @@ function questionCard(q, ans, revealed, mode){
     }
     const disabled = (mode !== "exam" && revealed) ? "disabled" : "";
     return `<button class="${cls}" data-action="select-option" data-arg="${i}" ${disabled}>
-      <span class="opt-letter">${letter(i)}</span><span class="opt-text">${optText}</span>
+      <span class="opt-letter">${letter(i)}</span>${optionThumb(q,i)}<span class="opt-text">${optText}</span>
     </button>`;
   }).join("");
   let feedback = "";
@@ -380,13 +421,13 @@ function questionCard(q, ans, revealed, mode){
     const wasCorrect = ans.selected === q.a;
     feedback = `<div class="feedback ${wasCorrect ? "ok":"bad"}">
       ${wasCorrect ? "✅ ¡Correcto!" : (ans.selected===null ? "⌛ Sin respuesta — se acabó el tiempo." : "❌ Incorrecto.")}
-      ${!wasCorrect ? `<div class="correct-note">Respuesta correcta: <strong>${letter(q.a)}) ${q.o[q.a]}</strong></div>` : ""}
+      ${!wasCorrect ? `<div class="correct-note">Respuesta correcta: <strong>${optionLabel(q,q.a)}</strong>${optionThumb(q,q.a)}</div>` : ""}
     </div>`;
   }
   return `<section class="q-card">
     ${questionMedia(q)}
     <h3 class="q-text">${q.q}</h3>
-    <div class="options">${options}</div>
+    <div class="options${q.oImg ? " img-options" : ""}">${options}</div>
     ${feedback}
   </section>`;
 }
@@ -509,8 +550,8 @@ function viewExamResults(){
       <div class="review-head"><span class="review-icon">${ok?"✅":"❌"}</span><span class="review-q">${q.q}</span></div>
       <div class="review-body">
         ${questionMedia(q)}
-        <div>Tu respuesta: ${ans && ans.selected!==null && ans.selected!==undefined ? `${letter(ans.selected)}) ${q.o[ans.selected]}` : "<em>sin responder</em>"}</div>
-        ${!ok ? `<div class="correct-note">Correcta: <strong>${letter(q.a)}) ${q.o[q.a]}</strong></div>` : ""}
+        <div>Tu respuesta: ${ans && ans.selected!==null && ans.selected!==undefined ? `${optionLabel(q,ans.selected)}${optionThumb(q,ans.selected)}` : "<em>sin responder</em>"}</div>
+        ${!ok ? `<div class="correct-note">Correcta: <strong>${optionLabel(q,q.a)}</strong>${optionThumb(q,q.a)}</div>` : ""}
       </div>
     </div>`;
   }).join("");
@@ -598,7 +639,7 @@ function resetProgress(){
 // ---------------- EVENT DELEGATION ----------------
 app.addEventListener("click", (e) => {
   const chip = e.target.closest(".chip");
-  if (chip){
+  if (chip && !chip.dataset.action){
     chip.parentElement.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
     chip.classList.add("active");
     return;
@@ -620,6 +661,7 @@ app.addEventListener("click", (e) => {
     case "finish-exam-confirm": finishExamConfirm(); break;
     case "review-fails-now": reviewFailsNow(arg); break;
     case "reset-progress": resetProgress(); break;
+    case "set-category": setCategory(arg); break;
   }
 });
 
@@ -628,6 +670,9 @@ document.querySelectorAll(".navbtn").forEach(b => {
 });
 const brandHome = document.getElementById("brandHome");
 if (brandHome) brandHome.addEventListener("click", () => go("home"));
+
+const subEl = document.querySelector(".brand-sub");
+if (subEl) subEl.textContent = CATEGORIES[currentCat].sub;
 
 render();
 })();

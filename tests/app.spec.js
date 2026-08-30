@@ -213,4 +213,54 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
     expect(Object.keys(parsed.perQuestion).length).toBe(0);
     expect(parsed.examHistory.length).toBe(0);
   });
+
+  test('selector de categoría cambia el banco de preguntas y persiste tras recargar', async ({ page }) => {
+    await page.goto('/index.html');
+    await expect(page.locator('.brand-sub')).toHaveText('Clase A · Categoría I');
+    const totalCatI = await page.locator('.hero-stat .big').nth(1).textContent();
+    expect(totalCatI).toContain('/200');
+
+    await page.click('[data-action="set-category"][data-arg="3c"]');
+    await expect(page.locator('.brand-sub')).toHaveText('Clase A · Categoría III-C');
+    const totalCatIII = await page.locator('.hero-stat .big').nth(1).textContent();
+    expect(totalCatIII).toContain('/339');
+
+    await page.reload();
+    await expect(page.locator('.brand-sub')).toHaveText('Clase A · Categoría III-C');
+    await expect(page.locator('.chip[data-arg="3c"]')).toHaveClass(/active/);
+  });
+
+  test('preguntas de rótulos de mercancías peligrosas (III-C) muestran imágenes como alternativas', async ({ page }) => {
+    await page.goto('/index.html');
+    await page.click('[data-action="set-category"][data-arg="3c"]');
+    await page.click('[data-nav="study-setup"]');
+    await page.click('.chip-group[data-group="count"] .chip[data-val="9999"]');
+    await page.click('[data-action="start-study"]');
+
+    let found = false;
+    for (let i = 0; i < 339 && !found; i++) {
+      if (await page.locator('.options.img-options').count()) {
+        found = true;
+        const imgs = page.locator('.options.img-options .opt-thumb');
+        const n = await imgs.count();
+        expect(n).toBeGreaterThan(0);
+        for (let j = 0; j < n; j++) {
+          const ok = await imgs.nth(j).evaluate(el => new Promise(resolve => {
+            const finish = () => resolve(el.naturalWidth > 0);
+            if (el.complete) return finish();
+            el.addEventListener('load', finish, { once: true });
+            el.addEventListener('error', finish, { once: true });
+          }));
+          expect(ok).toBe(true);
+        }
+        await page.locator('.opt-btn').first().click();
+        await expect(page.locator('.correct-note')).toBeVisible();
+        break;
+      }
+      if (await page.locator('.opt-btn').count()) await page.locator('.opt-btn').first().click();
+      const nextBtn = page.locator('[data-action="next-question"]');
+      if (await nextBtn.count()) await nextBtn.click();
+    }
+    expect(found).toBe(true);
+  });
 });

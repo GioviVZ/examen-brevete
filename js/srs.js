@@ -101,7 +101,7 @@ function recordExam(state, result){
 function computeStats(state, allQuestions){
   const total = allQuestions.length;
   const perQ = state.perQuestion;
-  const attempted = Object.keys(perQ).length;
+  const attempted = allQuestions.filter(q => !!perQ[q.id]).length;
   let correctSum = 0, wrongSum = 0, mastered = 0;
   const catStats = {};
   allQuestions.forEach(q => {
