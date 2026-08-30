@@ -71,6 +71,17 @@ function ring(percent, colorVar){
   return `background: conic-gradient(var(${colorVar||"--primary"}) ${percent}%, var(--ring-bg) 0)`;
 }
 
+// Íconos de línea propios (24x24, heredan color con currentColor) — reemplazan los emoji.
+const ICON = {
+  book: `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5c2-1 5-1 8 0v13c-3-1-6-1-8 0z"/><path d="M20 5.5c-2-1-5-1-8 0v13c3-1 6-1 8 0z"/></svg>`,
+  stopwatch: `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9v4.5l3 2"/><path d="M9.5 2.5h5"/><path d="M18.5 5.2l1.3-1.3"/></svg>`,
+  repeat: `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.7L4 15.5"/><path d="M4 20v-4.5h4.5"/></svg>`,
+  chart: `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/><path d="M3 20h18"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>`,
+  cross: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+  hourglass: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12M6 21h12"/><path d="M7 3c0 4 3.5 5 3.5 9s-3.5 5-3.5 9"/><path d="M17 3c0 4-3.5 5-3.5 9s3.5 5 3.5 9"/></svg>`,
+};
+
 function go(v, opts){ view = v; session = session; render(opts); }
 
 // ---------------- RENDER DISPATCH ----------------
@@ -115,22 +126,22 @@ function viewHome(){
   </section>
   <section class="cards-grid">
     <div class="action-card" data-action="nav" data-arg="study-setup">
-      <div class="ac-icon" style="background:#eaf2fd;color:var(--primary)">📘</div>
+      <div class="ac-icon" style="background:#eaf2fd;color:var(--primary)">${ICON.book}</div>
       <h3>Estudiar</h3>
       <p>Practica con retroalimentación inmediata, filtra por señales o normas, a tu ritmo o contrarreloj.</p>
     </div>
     <div class="action-card" data-action="nav" data-arg="exam-setup">
-      <div class="ac-icon" style="background:#fdeceb;color:var(--danger)">⏱️</div>
+      <div class="ac-icon" style="background:#fdeceb;color:var(--danger)">${ICON.stopwatch}</div>
       <h3>Simulacro de examen</h3>
       <p>${EXAM_SIZE} preguntas al azar, tiempo real de examen. Necesitas ${PASS_SCORE} aciertos para pasar.</p>
     </div>
     <div class="action-card" data-action="nav" data-arg="reinforce-setup">
-      <div class="ac-icon" style="background:#fef6e6;color:var(--warning)">🔁</div>
+      <div class="ac-icon" style="background:#fef6e6;color:var(--warning)">${ICON.repeat}</div>
       <h3>Refuerzo de fallos</h3>
       <p>Repite justo lo que más te cuesta, con repetición espaciada. ${dueCount ? `<span class="badge">${dueCount} listas</span>` : "Todo al día."}</p>
     </div>
     <div class="action-card" data-action="nav" data-arg="stats">
-      <div class="ac-icon" style="background:#eafaf1;color:var(--success)">📊</div>
+      <div class="ac-icon" style="background:#eafaf1;color:var(--success)">${ICON.chart}</div>
       <h3>Estadísticas</h3>
       <p>Revisa tu progreso, tus temas débiles y el historial de tus simulacros.</p>
     </div>
@@ -343,7 +354,7 @@ function viewRunning(){
 }
 
 function questionMedia(q){
-  if (q.sign) return `<div class="sign-box">${renderSign(q.sign, true)}<span class="sign-code">${q.sign}</span></div>`;
+  if (q.sign) return `<div class="sign-box">${renderSign(q.sign, true)}<span class="sign-code">${q.signLabel || q.sign}</span></div>`;
   if (q.diagram) return `<div class="sign-box">${renderDiagram(q.diagram, true)}</div>`;
   return "";
 }
@@ -419,8 +430,10 @@ function questionCard(q, ans, revealed, mode){
   let feedback = "";
   if (revealed && mode !== "exam"){
     const wasCorrect = ans.selected === q.a;
+    const fbIcon = wasCorrect ? ICON.check : (ans.selected===null ? ICON.hourglass : ICON.cross);
+    const fbText = wasCorrect ? "¡Correcto!" : (ans.selected===null ? "Sin respuesta — se acabó el tiempo." : "Incorrecto.");
     feedback = `<div class="feedback ${wasCorrect ? "ok":"bad"}">
-      ${wasCorrect ? "✅ ¡Correcto!" : (ans.selected===null ? "⌛ Sin respuesta — se acabó el tiempo." : "❌ Incorrecto.")}
+      <span class="feedback-icon">${fbIcon}</span>${fbText}
       ${!wasCorrect ? `<div class="correct-note">Respuesta correcta: <strong>${optionLabel(q,q.a)}</strong>${optionThumb(q,q.a)}</div>` : ""}
     </div>`;
   }
@@ -547,7 +560,7 @@ function viewExamResults(){
     const ans = session.answers[id];
     const ok = ans && ans.correct;
     return `<div class="review-row ${ok?"ok":"bad"}">
-      <div class="review-head"><span class="review-icon">${ok?"✅":"❌"}</span><span class="review-q">${q.q}</span></div>
+      <div class="review-head"><span class="review-icon ${ok?"ok":"bad"}">${ok?ICON.check:ICON.cross}</span><span class="review-q">${q.q}</span></div>
       <div class="review-body">
         ${questionMedia(q)}
         <div>Tu respuesta: ${ans && ans.selected!==null && ans.selected!==undefined ? `${optionLabel(q,ans.selected)}${optionThumb(q,ans.selected)}` : "<em>sin responder</em>"}</div>
@@ -557,7 +570,7 @@ function viewExamResults(){
   }).join("");
   return `
   <section class="results-card ${r.passed ? "pass":"fail"}">
-    <div class="pass-banner">${r.passed ? "🎉 ¡APROBADO!" : "❌ NO APROBADO"}</div>
+    <div class="pass-banner">${r.passed ? "🎉 ¡APROBADO!" : `<span class="feedback-icon">${ICON.cross}</span>NO APROBADO`}</div>
     <div class="score-circle" style="${ring(pct(r.score,r.total), r.passed?"--success":"--danger")}">
       <span>${r.score}/${r.total}</span>
     </div>
