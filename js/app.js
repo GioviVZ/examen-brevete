@@ -767,5 +767,11 @@ if (themeToggle){
   themeToggle.addEventListener("click", () => setTheme(currentTheme() === "dark" ? "light" : "dark"));
 }
 
+// Enlace de donación siempre visible en el pie de página (independiente del banner de logro).
+const footerSupport = document.getElementById("footerSupport");
+if (footerSupport && SUPPORT_LINK){
+  footerSupport.innerHTML = `<a class="footer-support-link" href="${SUPPORT_LINK}" target="_blank" rel="noopener">💙 ¿Te sirvió esta app? Apóyanos con una contribución</a>`;
+}
+
 render();
 })();
