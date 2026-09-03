@@ -39,14 +39,43 @@ function setCategory(catKey){
   saveCategory(catKey);
   rebuildQuestionIndex();
   session = null;
+  pendingResume = null;
+  clearSessionState();
   const sub = document.querySelector(".brand-sub");
   if (sub) sub.textContent = CATEGORIES[currentCat].sub;
   go("home");
 }
 
+// ---------------- SESIÓN GUARDADA (recuperar tras cerrar/recargar) ----------------
+const SESSION_KEY = "brevete_session";
+function saveSessionState(){
+  if (!session){ clearSessionState(); return; }
+  try{
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
+      cat: currentCat, mode: session.mode, queue: session.queue, index: session.index,
+      answers: session.answers, timerSec: session.timerSec, durationSec: session.durationSec,
+      examTimeLeft: session.examTimeLeft, revealed: session.revealed, startedAt: session.startedAt,
+      savedAt: Date.now(),
+    }));
+  }catch(e){}
+}
+function loadSessionState(){
+  try{ const raw = localStorage.getItem(SESSION_KEY); return raw ? JSON.parse(raw) : null; }
+  catch(e){ return null; }
+}
+function clearSessionState(){ try{ localStorage.removeItem(SESSION_KEY); }catch(e){} }
+
 let STATE = loadState();
 let session = null; // sesión activa de estudio/examen/refuerzo
+let pendingResume = null; // sesión guardada pendiente de reanudar, mostrada como banner en el inicio
 let view = "home";
+
+(function restorePendingSession(){
+  const saved = loadSessionState();
+  if (!saved) return;
+  if (saved.cat !== currentCat || !saved.queue || !saved.queue.length){ clearSessionState(); return; }
+  pendingResume = saved;
+})();
 
 const app = document.getElementById("app");
 
@@ -104,6 +133,7 @@ function render(){
   else if (view === "exam-results") app.innerHTML = viewExamResults();
   else if (view === "stats") app.innerHTML = viewStats();
   updateNav();
+  if (view === "running" && session) saveSessionState();
 }
 
 function updateNav(){
@@ -117,6 +147,7 @@ function viewHome(){
   const dueCount = ALL_IDS.filter(id => isDue(STATE, id)).length;
   const s = computeStats(STATE, ALL);
   return `
+  ${resumeBanner()}
   <div class="cat-switcher">
     <span class="cat-switcher-label">Categoría de licencia:</span>
     <div class="chip-group" data-group="category">
@@ -517,6 +548,7 @@ function exitSession(){
   showConfirm("¿Salir de esta sesión? Se perderá el progreso de esta ronda.", () => {
     stopQuestionTimer(); stopExamTimer();
     session = null;
+    clearSessionState();
     go("home");
   }, "Salir");
 }
@@ -532,6 +564,7 @@ function finishExamConfirm(){
 
 function finishSession(byTimeout){
   stopQuestionTimer(); stopExamTimer();
+  clearSessionState();
   if (session.mode === "exam"){
     let correct = 0;
     session.queue.forEach(id => {
@@ -551,6 +584,52 @@ function finishSession(byTimeout){
   } else {
     view = "session-summary";
   }
+  render();
+}
+
+// ---------------- REANUDAR SESIÓN GUARDADA ----------------
+function resumeBanner(){
+  if (!pendingResume) return "";
+  const p = pendingResume;
+  const modeLabel = p.mode === "exam" ? "Simulacro de examen" : (p.mode === "reinforce" ? "Refuerzo de fallos" : "Modo estudio");
+  const done = p.mode === "exam" ? Object.keys(p.answers || {}).length : p.index;
+  return `
+  <section class="resume-banner" id="resumeBanner">
+    <div class="resume-info">
+      <strong>Tienes una sesión sin terminar</strong>
+      <p class="muted">${modeLabel} · pregunta ${Math.min(done+1, p.queue.length)} de ${p.queue.length}</p>
+    </div>
+    <div class="resume-actions">
+      <button class="btn-primary" data-action="resume-session">Continuar</button>
+      <button class="btn-ghost" data-action="discard-session">Descartar</button>
+    </div>
+  </section>`;
+}
+
+function resumeSession(){
+  if (!pendingResume) return;
+  const p = pendingResume;
+  pendingResume = null;
+  session = {
+    mode: p.mode, queue: p.queue, index: p.index, answers: p.answers || {},
+    timerSec: p.timerSec || 0, qTimeLeft: p.timerSec || 0, qTimerHandle: null,
+    durationSec: p.durationSec ?? null,
+    examTimeLeft: p.durationSec != null ? Math.max(0, (p.examTimeLeft ?? p.durationSec) - Math.round((Date.now()-p.savedAt)/1000)) : null,
+    examTimerHandle: null, startedAt: p.startedAt || Date.now(), revealed: !!p.revealed,
+  };
+  if (session.mode === "exam" && session.durationSec != null && session.examTimeLeft <= 0){
+    finishSession(true);
+    return;
+  }
+  view = "running";
+  render();
+  if (session.mode === "exam") startExamTimer();
+  if (session.timerSec && !session.revealed) startQuestionTimer();
+}
+
+function discardPendingSession(){
+  pendingResume = null;
+  clearSessionState();
   render();
 }
 
@@ -704,6 +783,8 @@ function resetProgress(){
   showConfirm("Esto borrará todo tu progreso guardado (estadísticas, repeticiones e historial). ¿Continuar?", () => {
     STATE = defaultState();
     saveState(STATE);
+    pendingResume = null;
+    clearSessionState();
     go("home");
   }, "Borrar todo");
 }
@@ -736,6 +817,8 @@ app.addEventListener("click", (e) => {
     case "set-category": setCategory(arg); break;
     case "support-click": supportClick(); break;
     case "dismiss-support": dismissSupportBanner(); break;
+    case "resume-session": resumeSession(); break;
+    case "discard-session": discardPendingSession(); break;
   }
 });
 

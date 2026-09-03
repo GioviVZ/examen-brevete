@@ -263,4 +263,53 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
     }
     expect(found).toBe(true);
   });
+
+  test('recupera una sesión de estudio interrumpida al recargar', async ({ page }) => {
+    await page.goto('/index.html');
+    await page.click('[data-nav="study-setup"]');
+    await page.click('.chip-group[data-group="count"] .chip[data-val="10"]');
+    await page.click('[data-action="start-study"]');
+
+    // responde 3 de las 10 preguntas
+    for (let i = 0; i < 3; i++) {
+      await page.locator('.opt-btn').first().click();
+      await page.click('[data-action="next-question"]');
+    }
+    await expect(page.locator('.progress-label')).toContainText('4/10');
+
+    // recarga sin salir explícitamente (simula cierre/recarga accidental)
+    await page.reload();
+
+    await expect(page.locator('#resumeBanner')).toBeVisible();
+    await expect(page.locator('#resumeBanner')).toContainText('Modo estudio');
+    await expect(page.locator('#resumeBanner')).toContainText('4 de 10');
+
+    await page.click('[data-action="resume-session"]');
+    await expect(page.locator('.q-card')).toBeVisible();
+    await expect(page.locator('.progress-label')).toContainText('4/10');
+
+    // termina la ronda y confirma que la sesión guardada se limpia
+    for (let i = 0; i < 7; i++) {
+      await page.locator('.opt-btn').first().click();
+      await page.click('[data-action="next-question"]');
+    }
+    await expect(page.locator('.results-card')).toBeVisible();
+    const saved = await page.evaluate(() => localStorage.getItem('brevete_session'));
+    expect(saved).toBeNull();
+  });
+
+  test('descarta una sesión guardada sin reanudarla', async ({ page }) => {
+    await page.goto('/index.html');
+    await page.click('[data-nav="study-setup"]');
+    await page.click('[data-action="start-study"]');
+    await page.locator('.opt-btn').first().click();
+    await page.click('[data-action="next-question"]');
+    await page.reload();
+
+    await expect(page.locator('#resumeBanner')).toBeVisible();
+    await page.click('[data-action="discard-session"]');
+    await expect(page.locator('#resumeBanner')).toHaveCount(0);
+    const saved = await page.evaluate(() => localStorage.getItem('brevete_session'));
+    expect(saved).toBeNull();
+  });
 });
