@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 # Configuración única de servapp para servir examenbrevetesperu.com.
 # Correr UNA sola vez por SSH en servapp, como el usuario giovanni.
-# No contiene secretos: el token del runner de GitHub Actions se pega
-# aparte, siguiendo las instrucciones que da GitHub (Settings > Actions
-# > Runners > New self-hosted runner), y expira en ~1 hora.
+# No contiene secretos.
 set -euo pipefail
 
 SITE_DIR="$HOME/sites/examenbrevete"
@@ -42,8 +40,7 @@ sudo systemctl reload nginx
 
 echo ""
 echo "Listo. El sitio quedará servido en http://127.0.0.1:$PORT una vez que"
-echo "GitHub Actions haga el primer despliegue (ver README para instalar"
-echo "el runner autohospedado)."
+echo "corras deploy/deploy.sh desde tu equipo local (ver README)."
 echo ""
 echo "Falta: apuntar tu reverse proxy / Cloudflare Tunnel para que"
 echo "$DOMAIN -> servapp:$PORT (10.0.10.11:$PORT)."
