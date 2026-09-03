@@ -748,5 +748,24 @@ if (brandHome) brandHome.addEventListener("click", () => go("home"));
 const subEl = document.querySelector(".brand-sub");
 if (subEl) subEl.textContent = CATEGORIES[currentCat].sub;
 
+// ---------------- TEMA CLARO / OSCURO ----------------
+const THEME_KEY = "brevete_theme";
+function currentTheme(){
+  const attr = document.documentElement.getAttribute("data-theme");
+  if (attr === "light" || attr === "dark") return attr;
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+function setTheme(t){
+  document.documentElement.setAttribute("data-theme", t);
+  try{ localStorage.setItem(THEME_KEY, t); }catch(e){}
+  const btn = document.getElementById("themeToggle");
+  if (btn) btn.setAttribute("aria-label", t === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
+}
+const themeToggle = document.getElementById("themeToggle");
+if (themeToggle){
+  setTheme(currentTheme()); // sincroniza el aria-label con lo que ya aplicó el script inline del <head>
+  themeToggle.addEventListener("click", () => setTheme(currentTheme() === "dark" ? "light" : "dark"));
+}
+
 render();
 })();

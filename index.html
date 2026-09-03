@@ -3,6 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+// Aplica el tema guardado antes de pintar, para evitar el parpadeo del color equivocado.
+(function(){
+  try{
+    var t = localStorage.getItem("brevete_theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  }catch(e){}
+})();
+</script>
 <title>Examen de Brevete Perú Gratis 2026 | Simulacro Reglas de Tránsito Todas las Categorías</title>
 <meta name="description" content="Practica gratis el examen de brevete/licencia de conducir en Perú: simulacros con tiempo real, banco de preguntas oficial del MTC (señales de tránsito y normas) y refuerzo por repetición espaciada. Categorías I, II-A, II-B, III-A, III-B y III-C.">
 <meta name="keywords" content="examen de brevete, examen de reglas, licencia de conducir Perú, simulacro brevete, examen MTC, balotario brevete, señales de tránsito Perú, licencia de conducir categoría A, examen de manejo Perú">
@@ -98,6 +107,10 @@
     <button class="navbtn" data-nav="reinforce-setup">Refuerzo</button>
     <button class="navbtn" data-nav="stats">Estadísticas</button>
   </nav>
+  <button class="theme-toggle" id="themeToggle" aria-label="Cambiar a modo oscuro" title="Cambiar tema">
+    <svg class="icon-sun" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5z"/></svg>
+  </button>
 </header>
 <main id="app" class="app-main"></main>
 <footer class="foot">Material de práctica no oficial, basado en el balotario del MTC para licencias Clase A - Categorías I, II-A, II-B, III-A, III-B y III-C. Hecho para estudiar y aprobar. 🇵🇪</footer>
