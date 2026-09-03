@@ -11,7 +11,7 @@ const CATEGORIES = {
 };
 // Link de pago (Mercado Pago u otro) para el botón de donación. Vacío = todavía
 // no configurado; el botón muestra un mensaje amable en vez de un enlace roto.
-const SUPPORT_LINK = "";
+const SUPPORT_LINK = "https://link.mercadopago.com.pe/paraelchaufa";
 const SUPPORT_DISMISS_KEY = "brevete_support_dismissed";
 
 const CAT_KEY = "brevete_category";
