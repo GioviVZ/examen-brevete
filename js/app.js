@@ -2,10 +2,18 @@
 "use strict";
 
 const CATEGORIES = {
-  "1":  { label: "Categoría I",    sub: "Clase A · Categoría I",    questions: QUESTIONS },
+  "1":  { label: "Categoría I",     sub: "Clase A · Categoría I",     questions: QUESTIONS },
+  "2a": { label: "Categoría II-A",  sub: "Clase A · Categoría II-A",  questions: QUESTIONS.concat(typeof ESPECIFICAS_2A !== "undefined" ? ESPECIFICAS_2A : []) },
+  "2b": { label: "Categoría II-B",  sub: "Clase A · Categoría II-B",  questions: QUESTIONS.concat(typeof ESPECIFICAS_2B !== "undefined" ? ESPECIFICAS_2B : []) },
+  "3a": { label: "Categoría III-A", sub: "Clase A · Categoría III-A", questions: QUESTIONS.concat(typeof ESPECIFICAS_3A !== "undefined" ? ESPECIFICAS_3A : []) },
   "3b": { label: "Categoría III-B", sub: "Clase A · Categoría III-B", questions: QUESTIONS.concat(typeof ESPECIFICAS_3B !== "undefined" ? ESPECIFICAS_3B : []) },
   "3c": { label: "Categoría III-C", sub: "Clase A · Categoría III-C", questions: QUESTIONS.concat(typeof ESPECIFICAS_3C !== "undefined" ? ESPECIFICAS_3C : []) },
 };
+// Link de pago (Mercado Pago u otro) para el botón de donación. Vacío = todavía
+// no configurado; el botón muestra un mensaje amable en vez de un enlace roto.
+const SUPPORT_LINK = "";
+const SUPPORT_DISMISS_KEY = "brevete_support_dismissed";
+
 const CAT_KEY = "brevete_category";
 function loadCategory(){
   try{ const v = localStorage.getItem(CAT_KEY); return CATEGORIES[v] ? v : "1"; }
@@ -145,6 +153,25 @@ function viewHome(){
       <h3>Estadísticas</h3>
       <p>Revisa tu progreso, tus temas débiles y el historial de tus simulacros.</p>
     </div>
+  </section>
+  ${homeFaq()}`;
+}
+
+function homeFaq(){
+  const items = [
+    ["¿El examen de práctica es gratis?", "Sí, todo el contenido de Brevete Perú es completamente gratuito: modo estudio, simulacros de examen y refuerzo de fallos."],
+    ["¿De dónde salen las preguntas del examen de brevete?", "Las preguntas provienen del balotario oficial publicado por el Ministerio de Transportes y Comunicaciones (MTC) del Perú, verificadas pregunta por pregunta contra el documento original."],
+    ["¿Cuántas preguntas tiene el examen de reglas y cuántas necesito para aprobar?", `El simulacro tiene ${EXAM_SIZE} preguntas al azar, igual que el examen real del MTC, y necesitas ${PASS_SCORE} respuestas correctas para aprobar.`],
+    ["¿Para qué categorías de licencia sirve este simulacro?", "Cubre las categorías de licencia Clase A: I, II-A, II-B, III-A, III-B y III-C, cada una con sus preguntas específicas además del banco general de reglas de tránsito."],
+  ];
+  return `
+  <section class="faq-section">
+    <h2>Preguntas frecuentes</h2>
+    ${items.map(([q,a]) => `
+    <details class="faq-item">
+      <summary>${q}</summary>
+      <p>${a}</p>
+    </details>`).join("")}
   </section>`;
 }
 
@@ -527,6 +554,36 @@ function finishSession(byTimeout){
   render();
 }
 
+// ---------------- DONACIÓN ----------------
+function isSupportDismissed(){
+  try{ return sessionStorage.getItem(SUPPORT_DISMISS_KEY) === "1"; }catch(e){ return false; }
+}
+function dismissSupportBanner(){
+  try{ sessionStorage.setItem(SUPPORT_DISMISS_KEY, "1"); }catch(e){}
+  const el = document.getElementById("supportBanner");
+  if (el) el.remove();
+}
+function donationBanner(){
+  if (isSupportDismissed()) return "";
+  return `
+  <section class="support-banner" id="supportBanner">
+    <button class="support-close" data-action="dismiss-support" aria-label="Cerrar">${ICON.cross}</button>
+    <div class="support-emoji">💙</div>
+    <h3>¡Felicitaciones por tu logro!</h3>
+    <p>Este material es gratuito y lo hacemos con cariño para que puedas sacar tu brevete. Si te está sirviendo, considera apoyar el proyecto para que siga creciendo y mantenerlo gratis para más gente.</p>
+    <button class="btn-primary" data-action="support-click">Apoyar este proyecto</button>
+  </section>`;
+}
+function supportClick(){
+  if (SUPPORT_LINK){ window.open(SUPPORT_LINK, "_blank", "noopener"); return; }
+  const btn = document.querySelector('[data-action="support-click"]');
+  if (btn && !btn.dataset.clicked){
+    btn.dataset.clicked = "1";
+    btn.textContent = "¡Gracias! Muy pronto podrás donar aquí 💙";
+    btn.disabled = true;
+  }
+}
+
 function viewSessionSummary(){
   const total = session.queue.length;
   let correct = 0;
@@ -544,7 +601,8 @@ function viewSessionSummary(){
       <button class="btn-ghost" data-action="nav" data-arg="study-setup">Otra ronda</button>
       <button class="btn-ghost" data-action="nav" data-arg="home">Inicio</button>
     </div>
-  </section>`;
+  </section>
+  ${(correct/total >= 0.9) ? donationBanner() : ""}`;
 }
 
 function reviewFailsNow(idsStr){
@@ -581,6 +639,7 @@ function viewExamResults(){
       <button class="btn-ghost" data-action="nav" data-arg="home">Inicio</button>
     </div>
   </section>
+  ${r.passed ? donationBanner() : ""}
   <section class="review-list">
     <h3>Repaso de tus respuestas</h3>
     ${reviewRows}
@@ -675,6 +734,8 @@ app.addEventListener("click", (e) => {
     case "review-fails-now": reviewFailsNow(arg); break;
     case "reset-progress": resetProgress(); break;
     case "set-category": setCategory(arg); break;
+    case "support-click": supportClick(); break;
+    case "dismiss-support": dismissSupportBanner(); break;
   }
 });
 
