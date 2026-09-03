@@ -102,6 +102,7 @@ function fmtTime(sec){
   return `${m}:${String(s).padStart(2,"0")}`;
 }
 function letter(i){ return ["A","B","C","D"][i]; }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function catOf(q){ return (q.sign || q.diagram) ? "senales" : "normas"; }
 function pct(n,d){ return d>0 ? Math.round((n/d)*100) : 0; }
 function ring(percent, colorVar){
@@ -146,6 +147,7 @@ function updateNav(){
 function viewHome(){
   const dueCount = ALL_IDS.filter(id => isDue(STATE, id)).length;
   const s = computeStats(STATE, ALL);
+  const streak = computeStreak(STATE);
   return `
   ${resumeBanner()}
   <div class="cat-switcher">
@@ -158,6 +160,7 @@ function viewHome(){
     <h1>Prepárate para tu examen de Reglas</h1>
     <p>${CATEGORIES[currentCat].sub} — 40 preguntas, necesitas <strong>${PASS_SCORE}/${EXAM_SIZE}</strong> correctas para aprobar.</p>
     <div class="hero-stats">
+      <div class="hero-stat"><span class="big">🔥 ${streak}</span><span>${streak===1?"día seguido":"días seguidos"}</span></div>
       <div class="hero-stat"><span class="big">${s.accuracy}%</span><span>precisión global</span></div>
       <div class="hero-stat"><span class="big">${s.mastered}/${s.total}</span><span>preguntas dominadas</span></div>
       <div class="hero-stat"><span class="big">${dueCount}</span><span>pendientes de repaso</span></div>
@@ -735,6 +738,11 @@ function viewStats(){
   <section class="setup-card">
     <button class="backlink" data-action="nav" data-arg="home">&larr; Inicio</button>
     <h2>Estadísticas</h2>
+    <div class="field search-field">
+      <label for="searchQ">Buscar pregunta o señal</label>
+      <input type="search" id="searchQ" placeholder="Ej: R-3, ceda el paso, límite de velocidad" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
     <div class="hero-stats">
       <div class="hero-stat"><span class="big">${s.attempted}/${s.total}</span><span>preguntas practicadas</span></div>
       <div class="hero-stat"><span class="big">${s.accuracy}%</span><span>precisión global</span></div>
@@ -779,6 +787,34 @@ function viewStats(){
   </section>`;
 }
 
+// ---------------- BUSCADOR DE PREGUNTAS / SEÑALES ----------------
+let lastSearchIds = [];
+function updateSearchResults(term){
+  const box = document.getElementById("searchResults");
+  if (!box) return;
+  const t = term.trim().toLowerCase();
+  if (t.length < 2){ box.innerHTML = ""; lastSearchIds = []; return; }
+  const matches = ALL.filter(q => {
+    const codeMatch = (q.sign && q.sign.toLowerCase().includes(t)) || (q.signLabel && q.signLabel.toLowerCase().includes(t));
+    const textMatch = q.q.toLowerCase().includes(t);
+    return codeMatch || textMatch;
+  }).slice(0, 15);
+  lastSearchIds = matches.map(x => x.id);
+  if (matches.length === 0){
+    box.innerHTML = `<p class="empty-note">Sin resultados para "${escapeHtml(term)}".</p>`;
+    return;
+  }
+  box.innerHTML = `
+    <div class="most-failed">
+      ${matches.map(q => `<div class="mf-row"><span class="mf-code">${q.sign || ""}</span><span class="mf-text">${escapeHtml(q.q)}</span></div>`).join("")}
+    </div>
+    <button class="btn-primary" data-action="search-practice" style="margin-top:12px">Practicar ${matches.length===1?"esta pregunta":`estos ${matches.length} resultados`}</button>`;
+}
+function startSearchPractice(){
+  if (!lastSearchIds.length) return;
+  beginSession({ mode:"study", queue: lastSearchIds.slice(), timerSec: 0 });
+}
+
 function resetProgress(){
   showConfirm("Esto borrará todo tu progreso guardado (estadísticas, repeticiones e historial). ¿Continuar?", () => {
     STATE = defaultState();
@@ -819,7 +855,12 @@ app.addEventListener("click", (e) => {
     case "dismiss-support": dismissSupportBanner(); break;
     case "resume-session": resumeSession(); break;
     case "discard-session": discardPendingSession(); break;
+    case "search-practice": startSearchPractice(); break;
   }
+});
+
+app.addEventListener("input", (e) => {
+  if (e.target.id === "searchQ") updateSearchResults(e.target.value);
 });
 
 document.querySelectorAll(".navbtn").forEach(b => {

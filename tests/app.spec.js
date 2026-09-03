@@ -15,8 +15,8 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
     await expect(page.locator('.action-card', { hasText: 'Simulacro de examen' })).toBeVisible();
     await expect(page.locator('.action-card', { hasText: 'Refuerzo de fallos' })).toBeVisible();
     await expect(page.locator('.action-card', { hasText: 'Estadísticas' })).toBeVisible();
-    // stats start at 0
-    await expect(page.locator('.hero-stat .big').first()).toHaveText('0%');
+    // stats start at 0 (índice 0 es la racha de días, índice 1 la precisión)
+    await expect(page.locator('.hero-stat .big').nth(1)).toHaveText('0%');
 
     expect(consoleErrors, `Errores de consola: ${consoleErrors.join(' | ')}`).toEqual([]);
   });
@@ -194,6 +194,75 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
     expect(attemptedAfterReload).toEqual(attempted);
   });
 
+  test('racha de días seguidos se activa al practicar y persiste tras recargar', async ({ page }) => {
+    await page.goto('/index.html');
+    await expect(page.locator('.hero-stat .big').first()).toHaveText('🔥 0');
+
+    await page.click('[data-nav="study-setup"]');
+    await page.click('[data-action="start-study"]');
+    await page.locator('.opt-btn').first().click();
+
+    await page.click('[data-nav="home"]');
+    await expect(page.locator('.hero-stat .big').first()).toHaveText('🔥 1');
+
+    await page.reload();
+    await expect(page.locator('.hero-stat .big').first()).toHaveText('🔥 1');
+  });
+
+  test('el buscador de estadísticas encuentra preguntas y permite practicarlas', async ({ page }) => {
+    await page.goto('/index.html');
+    await page.click('[data-nav="stats"]');
+
+    await page.fill('#searchQ', 'ceda el paso');
+    const results = page.locator('.search-results .mf-row');
+    await expect(results.first()).toBeVisible();
+    const count = await results.count();
+    expect(count).toBeGreaterThan(0);
+
+    await page.click('[data-action="search-practice"]');
+    await expect(page.locator('.q-card')).toBeVisible();
+    await expect(page.locator('.progress-label')).toContainText(`1/${count}`);
+
+    // sin coincidencias
+    await page.click('[data-nav="stats"]');
+    await page.fill('#searchQ', 'zzzznoexiste');
+    await expect(page.locator('.search-results .empty-note')).toBeVisible();
+  });
+
+  test('la app es instalable (manifest + ícono) y registra el service worker', async ({ page }) => {
+    await page.goto('/index.html');
+
+    const manifestHref = await page.locator('link[rel="manifest"]').getAttribute('href');
+    expect(manifestHref).toBe('manifest.webmanifest');
+    const manifestRes = await page.request.get('/manifest.webmanifest');
+    expect(manifestRes.ok()).toBeTruthy();
+    const manifest = await manifestRes.json();
+    expect(manifest.name).toContain('Brevete');
+    expect(manifest.icons.length).toBeGreaterThan(0);
+    for (const icon of manifest.icons) {
+      const res = await page.request.get(`/${icon.src}`);
+      expect(res.ok()).toBeTruthy();
+    }
+
+    const swRegistered = await page.evaluate(async () => {
+      if (!('serviceWorker' in navigator)) return false;
+      try { return !!(await navigator.serviceWorker.ready); } catch (e) { return false; }
+    });
+    expect(swRegistered).toBeTruthy();
+  });
+
+  test('la app sigue funcionando sin conexión tras la primera carga', async ({ page, context }) => {
+    await page.goto('/index.html');
+    await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+    await page.waitForTimeout(1000); // deja tiempo a que el SW termine de cachear el app shell
+
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.locator('.hero h1')).toBeVisible();
+    await expect(page.locator('.action-card')).toHaveCount(4);
+    await context.setOffline(false);
+  });
+
   test('reiniciar progreso limpia las estadísticas mediante el modal propio', async ({ page }) => {
     await page.goto('/index.html');
     await page.click('[data-nav="study-setup"]');
@@ -206,8 +275,8 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
     await expect(page.locator('.modal-box')).toBeVisible();
     await page.click('.modal-box [data-modal="ok"]');
 
-    // vuelve a inicio con estadísticas en cero
-    await expect(page.locator('.hero-stat .big').first()).toHaveText('0%');
+    // vuelve a inicio con estadísticas en cero (índice 0 es la racha de días)
+    await expect(page.locator('.hero-stat .big').nth(1)).toHaveText('0%');
     const stored = await page.evaluate(() => localStorage.getItem('brevete_v1'));
     const parsed = JSON.parse(stored);
     expect(Object.keys(parsed.perQuestion).length).toBe(0);
@@ -217,12 +286,12 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
   test('selector de categoría cambia el banco de preguntas y persiste tras recargar', async ({ page }) => {
     await page.goto('/index.html');
     await expect(page.locator('.brand-sub')).toHaveText('Clase A · Categoría I');
-    const totalCatI = await page.locator('.hero-stat .big').nth(1).textContent();
+    const totalCatI = await page.locator('.hero-stat .big').nth(2).textContent();
     expect(totalCatI).toContain('/200');
 
     await page.click('[data-action="set-category"][data-arg="3c"]');
     await expect(page.locator('.brand-sub')).toHaveText('Clase A · Categoría III-C');
-    const totalCatIII = await page.locator('.hero-stat .big').nth(1).textContent();
+    const totalCatIII = await page.locator('.hero-stat .big').nth(2).textContent();
     expect(totalCatIII).toContain('/339');
 
     await page.reload();

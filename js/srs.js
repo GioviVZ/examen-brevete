@@ -7,7 +7,39 @@ const MAX_BOX = BOX_INTERVALS_MS.length - 1;
 function nowTs(){ return Date.now(); }
 
 function defaultState(){
-  return { perQuestion: {}, examHistory: [], createdAt: nowTs() };
+  return { perQuestion: {}, examHistory: [], practiceDays: [], createdAt: nowTs() };
+}
+
+function todayStr(d){
+  d = d || new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+
+function recordPracticeDay(state){
+  const t = todayStr();
+  if (!state.practiceDays.includes(t)){
+    state.practiceDays.push(t);
+    if (state.practiceDays.length > 400) state.practiceDays.shift();
+  }
+}
+
+// Racha de días consecutivos con práctica, contando hoy o (si aún no se practicó
+// hoy) manteniendo la racha de ayer como gracia hasta que termine el día.
+function computeStreak(state){
+  const days = state.practiceDays || [];
+  if (!days.length) return 0;
+  const set = new Set(days);
+  const cursor = new Date();
+  if (!set.has(todayStr(cursor))){
+    cursor.setDate(cursor.getDate() - 1);
+    if (!set.has(todayStr(cursor))) return 0;
+  }
+  let streak = 0;
+  while (set.has(todayStr(cursor))){
+    streak++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
 }
 
 function loadState(){
@@ -47,6 +79,7 @@ function recordAnswer(state, id, isCorrect){
     s.lastResult = "fail";
   }
   s.dueAt = nowTs() + BOX_INTERVALS_MS[s.box];
+  recordPracticeDay(state);
   saveState(state);
   return s;
 }
@@ -127,5 +160,6 @@ function computeStats(state, allQuestions){
 
 if (typeof module !== "undefined") module.exports = {
   STORAGE_KEY, loadState, saveState, qStat, recordAnswer, isDue, isMastered,
-  failedQuestionIds, buildReinforcementQueue, shuffle, pickRandom, recordExam, computeStats
+  failedQuestionIds, buildReinforcementQueue, shuffle, pickRandom, recordExam, computeStats,
+  todayStr, recordPracticeDay, computeStreak
 };
