@@ -15,6 +15,7 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
     await expect(page.locator('.action-card', { hasText: 'Simulacro de examen' })).toBeVisible();
     await expect(page.locator('.action-card', { hasText: 'Refuerzo de fallos' })).toBeVisible();
     await expect(page.locator('.action-card', { hasText: 'Estadísticas' })).toBeVisible();
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://examenbrevetesperu.com/');
     // stats start at 0 (índice 0 es la racha de días, índice 1 la precisión)
     await expect(page.locator('.hero-stat .big').nth(1)).toHaveText('0%');
 

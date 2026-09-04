@@ -4,13 +4,14 @@
 # No contiene secretos.
 set -euo pipefail
 
-SITE_DIR="$HOME/sites/examenbrevete"
+SITE_DIR="/var/www/examenbrevete"
+SITE_OWNER="${SUDO_USER:-$(id -un)}"
 NGINX_CONF="/etc/nginx/sites-available/examenbrevete.conf"
 PORT=8090
 DOMAIN="examenbrevetesperu.com"
 
 echo "==> Creando directorio del sitio en $SITE_DIR"
-mkdir -p "$SITE_DIR"
+sudo install -d -o "$SITE_OWNER" -g www-data -m 0755 "$SITE_DIR"
 
 echo "==> Escribiendo bloque de Nginx en $NGINX_CONF (puerto $PORT)"
 sudo tee "$NGINX_CONF" > /dev/null <<EOF
@@ -20,7 +21,11 @@ server {
     root $SITE_DIR;
     index index.html;
     location / {
-        try_files \$uri \$uri/ =404;
+        try_files \$uri \$uri/ /index.html;
+    }
+    location = /sw.js {
+        add_header Cache-Control "no-cache";
+        try_files \$uri =404;
     }
 }
 EOF
