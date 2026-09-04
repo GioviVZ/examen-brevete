@@ -21,6 +21,72 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
     expect(consoleErrors, `Errores de consola: ${consoleErrors.join(' | ')}`).toEqual([]);
   });
 
+  test('la donación permanente explica el destino y tiene un objetivo táctil accesible', async ({ page }) => {
+    await page.goto('/index.html');
+
+    const link = page.locator('.footer-support-link');
+    await expect(link).toBeVisible();
+    await expect(link).toContainText('Donar a Brevete Perú');
+    await expect(link).toContainText('Mercado Pago');
+    await expect(link).toHaveAttribute('href', 'https://link.mercadopago.com.pe/paraelchaufa');
+    await expect(link).toHaveAttribute('target', '_blank');
+
+    const box = await link.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box.height).toBeGreaterThanOrEqual(44);
+
+    await link.focus();
+    await expect(link).toBeFocused();
+    const outline = await link.evaluate(el => getComputedStyle(el).outlineStyle);
+    expect(outline).not.toBe('none');
+  });
+
+  test('el pedido contextual de apoyo es claro, opcional y usable en móvil', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.goto('/index.html');
+    await page.click('[data-nav="study-setup"]');
+    await page.click('.chip-group[data-group="count"] .chip[data-val="10"]');
+    await page.click('[data-action="start-study"]');
+
+    for (let i = 0; i < 10; i++) {
+      const correctIndex = await page.evaluate(() => {
+        const banks = [
+          QUESTIONS,
+          ESPECIFICAS_2A,
+          ESPECIFICAS_2B,
+          ESPECIFICAS_3A,
+          ESPECIFICAS_3B,
+          ESPECIFICAS_3C,
+        ].flat();
+        const text = document.querySelector('.q-text').textContent.trim();
+        return banks.find(q => q.q === text).a;
+      });
+      await page.locator('.opt-btn').nth(correctIndex).click();
+      await page.click('[data-action="next-question"]');
+    }
+
+    const banner = page.locator('#supportBanner');
+    const donate = banner.locator('.support-cta');
+    const later = banner.locator('.support-later');
+    await expect(banner).toBeVisible();
+    await expect(banner.locator('h3')).toHaveText('¿Te ayudó esta práctica?');
+    await expect(banner).toContainText('La contribución es opcional');
+    await expect(donate).toContainText('Donar con Mercado Pago');
+    await expect(donate).toHaveAttribute('target', '_blank');
+
+    for (const control of [donate, later]) {
+      const controlBox = await control.boundingBox();
+      expect(controlBox).not.toBeNull();
+      expect(controlBox.height).toBeGreaterThanOrEqual(44);
+    }
+    const hasHorizontalOverflow = await banner.evaluate(el => el.scrollWidth > el.clientWidth);
+    expect(hasHorizontalOverflow).toBe(false);
+
+    await later.click();
+    await expect(banner).toHaveCount(0);
+    expect(await page.evaluate(() => sessionStorage.getItem('brevete_support_dismissed'))).toBe('1');
+  });
+
   test('modo estudio: responde correcto e incorrecto y muestra retroalimentación', async ({ page }) => {
     await page.goto('/index.html');
     await page.click('[data-nav="study-setup"]');

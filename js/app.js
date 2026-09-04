@@ -118,6 +118,8 @@ const ICON = {
   check: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>`,
   cross: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
   hourglass: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12M6 21h12"/><path d="M7 3c0 4 3.5 5 3.5 9s-3.5 5-3.5 9"/><path d="M17 3c0 4-3.5 5-3.5 9s3.5 5 3.5 9"/></svg>`,
+  heart: `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z"/></svg>`,
+  external: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 5h5v5"/><path d="M10 14 19 5"/><path d="M19 13v6H5V5h6"/></svg>`,
 };
 
 function go(v, opts){ view = v; session = session; render(opts); }
@@ -648,16 +650,27 @@ function dismissSupportBanner(){
 function donationBanner(){
   if (isSupportDismissed()) return "";
   return `
-  <section class="support-banner" id="supportBanner">
-    <button class="support-close" data-action="dismiss-support" aria-label="Cerrar">${ICON.cross}</button>
-    <div class="support-emoji">💙</div>
-    <h3>¡Felicitaciones por tu logro!</h3>
-    <p>Este material es gratuito y lo hacemos con cariño para que puedas sacar tu brevete. Si te está sirviendo, considera apoyar el proyecto para que siga creciendo y mantenerlo gratis para más gente.</p>
-    <button class="btn-primary" data-action="support-click">Apoyar este proyecto</button>
+  <section class="support-banner" id="supportBanner" aria-labelledby="supportTitle" aria-describedby="supportDescription supportMeta">
+    <div class="support-icon" aria-hidden="true">${ICON.heart}</div>
+    <div class="support-copy">
+      <span class="support-eyebrow">Aporte voluntario</span>
+      <h3 id="supportTitle">¿Te ayudó esta práctica?</h3>
+      <p id="supportDescription">Tu aporte nos ayuda a mantener las preguntas actualizadas y esta herramienta gratuita para más postulantes.</p>
+      <p class="support-meta" id="supportMeta">La contribución es opcional y tu acceso seguirá siendo gratuito. Mercado Pago se abre en una pestaña nueva.</p>
+    </div>
+    <div class="support-actions">
+      ${SUPPORT_LINK
+        ? `<a class="support-cta" href="${SUPPORT_LINK}" target="_blank" rel="noopener noreferrer" data-action="support-click" aria-describedby="supportMeta">${ICON.heart}<span>Donar con Mercado Pago</span>${ICON.external}</a>`
+        : `<button class="support-cta" type="button" data-action="support-click">${ICON.heart}<span>Quiero apoyar el proyecto</span></button>`}
+      <button class="support-later" type="button" data-action="dismiss-support">Ahora no</button>
+    </div>
   </section>`;
 }
 function supportClick(){
-  if (SUPPORT_LINK){ window.open(SUPPORT_LINK, "_blank", "noopener"); return; }
+  if (SUPPORT_LINK){
+    try{ sessionStorage.setItem(SUPPORT_DISMISS_KEY, "1"); }catch(e){}
+    return;
+  }
   const btn = document.querySelector('[data-action="support-click"]');
   if (btn && !btn.dataset.clicked){
     btn.dataset.clicked = "1";
@@ -894,7 +907,7 @@ if (themeToggle){
 // Enlace de donación siempre visible en el pie de página (independiente del banner de logro).
 const footerSupport = document.getElementById("footerSupport");
 if (footerSupport && SUPPORT_LINK){
-  footerSupport.innerHTML = `<a class="footer-support-link" href="${SUPPORT_LINK}" target="_blank" rel="noopener">💙 ¿Te sirvió esta app? Apóyanos con una contribución</a>`;
+  footerSupport.innerHTML = `<a class="footer-support-link" href="${SUPPORT_LINK}" target="_blank" rel="noopener noreferrer" aria-label="Donar a Brevete Perú con Mercado Pago; se abre en una pestaña nueva">${ICON.heart}<span>Donar a Brevete Perú</span><span class="footer-support-provider">Mercado Pago ${ICON.external}</span></a>`;
 }
 
 render();
