@@ -1,7 +1,7 @@
 {
-  "name": "Brevete Perú - Examen de Reglas",
+  "name": "Brevete Perú - Simulacro Examen de Conocimientos",
   "short_name": "Brevete Perú",
-  "description": "Simulacro gratuito del examen de reglas de tránsito para sacar el brevete en Perú, con banco oficial del MTC.",
+  "description": "Simulacro gratuito del examen de conocimientos para sacar el brevete en Perú, basado en los balotarios del MTC.",
   "start_url": "index.html",
   "scope": "./",
   "display": "standalone",

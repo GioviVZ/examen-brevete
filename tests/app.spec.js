@@ -9,7 +9,8 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
     page.on('pageerror', err => consoleErrors.push(err.message));
 
     await page.goto('/index.html');
-    await expect(page.locator('.hero h1')).toHaveText(/Prepárate para tu examen/);
+    await expect(page.locator('.hero h1')).toHaveText(/Simulacro del examen de conocimientos/);
+    await expect(page.locator('.hero')).toContainText('35/40');
     await expect(page.locator('.action-card')).toHaveCount(4);
     await expect(page.locator('.action-card', { hasText: 'Estudiar' })).toBeVisible();
     await expect(page.locator('.action-card', { hasText: 'Simulacro de examen' })).toBeVisible();
@@ -20,6 +21,30 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
     await expect(page.locator('.hero-stat .big').nth(1)).toHaveText('0%');
 
     expect(consoleErrors, `Errores de consola: ${consoleErrors.join(' | ')}`).toEqual([]);
+  });
+
+  test('SEO identifica el sitio, la app educativa y la referencia oficial del MTC', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.goto('/index.html');
+
+    await expect(page).toHaveTitle('Simulacro Examen de Conocimientos MTC 2026 | Brevete Perú');
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /examen de conocimientos del MTC/);
+    await expect(page.locator('meta[name="googlebot"]')).toHaveAttribute('content', /max-image-preview:large/);
+
+    const officialLink = page.locator('.official-link');
+    await expect(officialLink).toBeVisible();
+    await expect(officialLink).toHaveAttribute('href', 'https://sierdgtt.mtc.gob.pe/');
+    const officialLinkBox = await officialLink.boundingBox();
+    expect(officialLinkBox).not.toBeNull();
+    expect(officialLinkBox.height).toBeGreaterThanOrEqual(44);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
+
+    const structuredData = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const entities = structuredData.map(text => JSON.parse(text));
+    expect(entities.some(entity => entity['@type'] === 'WebSite' && entity.name === 'Brevete Perú')).toBe(true);
+    expect(entities.some(entity => entity['@type'] === 'WebApplication'
+      && entity.applicationCategory === 'EducationalApplication'
+      && entity.isBasedOn?.url === 'https://sierdgtt.mtc.gob.pe/')).toBe(true);
   });
 
   test('la donación permanente explica el destino y tiene un objetivo táctil accesible', async ({ page }) => {

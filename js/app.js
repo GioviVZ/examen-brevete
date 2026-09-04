@@ -31,7 +31,7 @@ function rebuildQuestionIndex(){
 }
 rebuildQuestionIndex();
 const EXAM_SIZE = 40;
-const PASS_SCORE = 38;
+const PASS_SCORE = 35;
 
 function setCategory(catKey){
   if (!CATEGORIES[catKey] || catKey === currentCat) return;
@@ -159,8 +159,8 @@ function viewHome(){
     </div>
   </div>
   <section class="hero">
-    <h1>Prepárate para tu examen de Reglas</h1>
-    <p>${CATEGORIES[currentCat].sub} — 40 preguntas, necesitas <strong>${PASS_SCORE}/${EXAM_SIZE}</strong> correctas para aprobar.</p>
+    <h1>Simulacro del examen de conocimientos para tu brevete</h1>
+    <p>${CATEGORIES[currentCat].sub} — practica con preguntas basadas en los balotarios del MTC. Necesitas <strong>${PASS_SCORE}/${EXAM_SIZE}</strong> correctas para aprobar.</p>
     <div class="hero-stats">
       <div class="hero-stat"><span class="big">🔥 ${streak}</span><span>${streak===1?"día seguido":"días seguidos"}</span></div>
       <div class="hero-stat"><span class="big">${s.accuracy}%</span><span>precisión global</span></div>
@@ -190,6 +190,18 @@ function viewHome(){
       <p>Revisa tu progreso, tus temas débiles y el historial de tus simulacros.</p>
     </div>
   </section>
+  <section class="official-reference" aria-labelledby="official-reference-title">
+    <div class="official-reference-copy">
+      <span class="official-kicker">Referencia oficial</span>
+      <h2 id="official-reference-title">Simulacro de Examen de Conocimientos del MTC</h2>
+      <p>Contrasta tu preparación en el portal del Ministerio de Transportes y Comunicaciones. Su simulacro oficial contiene 40 preguntas y requiere 35 respuestas correctas para aprobar.</p>
+      <p class="official-disclaimer">Brevete Perú es una herramienta gratuita e independiente; no reemplaza al portal oficial ni está afiliada al MTC.</p>
+    </div>
+    <a class="official-link" href="https://sierdgtt.mtc.gob.pe/" target="_blank" rel="noopener noreferrer">
+      Visitar simulacro oficial
+      ${ICON.external}
+    </a>
+  </section>
   ${homeFaq()}`;
 }
 
@@ -197,8 +209,9 @@ function homeFaq(){
   const items = [
     ["¿El examen de práctica es gratis?", "Sí, todo el contenido de Brevete Perú es completamente gratuito: modo estudio, simulacros de examen y refuerzo de fallos."],
     ["¿De dónde salen las preguntas del examen de brevete?", "Las preguntas provienen del balotario oficial publicado por el Ministerio de Transportes y Comunicaciones (MTC) del Perú, verificadas pregunta por pregunta contra el documento original."],
-    ["¿Cuántas preguntas tiene el examen de reglas y cuántas necesito para aprobar?", `El simulacro tiene ${EXAM_SIZE} preguntas al azar, igual que el examen real del MTC, y necesitas ${PASS_SCORE} respuestas correctas para aprobar.`],
+    ["¿Cuántas preguntas tiene el examen de reglas y cuántas necesito para aprobar?", `El simulacro tiene ${EXAM_SIZE} preguntas al azar y necesitas ${PASS_SCORE} respuestas correctas para aprobar, de acuerdo con la información publicada por el MTC.`],
     ["¿Para qué categorías de licencia sirve este simulacro?", "Cubre las categorías de licencia Clase A: I, II-A, II-B, III-A, III-B y III-C, cada una con sus preguntas específicas además del banco general de reglas de tránsito."],
+    ["¿Dónde encuentro el simulacro oficial del MTC?", `Puedes acceder al <a href="https://sierdgtt.mtc.gob.pe/" target="_blank" rel="noopener noreferrer">Simulacro de Examen de Conocimientos del MTC</a>. Brevete Perú es una herramienta de práctica independiente y no reemplaza el portal del Ministerio.`],
   ];
   return `
   <section class="faq-section">
