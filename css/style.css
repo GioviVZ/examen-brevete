@@ -92,10 +92,12 @@ h1,h2,h3,
 :root[data-theme="dark"] .theme-toggle .icon-moon{display:none;}
 
 .app-main{max-width:900px; margin:0 auto; padding:22px 18px 60px;}
-.foot{text-align:center; color:var(--muted); font-size:12px; padding:20px; opacity:.8;}
+.foot{text-align:center; padding:20px;}
 .foot p{margin:0 0 6px;}
 .foot p:last-child{margin-bottom:0;}
-.footer-support-link{color:var(--primary); font-weight:700; text-decoration:none; opacity:1;}
+.foot-disclaimer{color:var(--muted); font-size:11px; opacity:.65;}
+.foot-disclaimer a{color:inherit; text-decoration:underline;}
+.footer-support-link{color:var(--primary); font-weight:700; text-decoration:none;}
 .footer-support-link:hover{text-decoration:underline;}
 
 /* HOME */

@@ -194,7 +194,7 @@ function viewHome(){
 function homeFaq(){
   const items = [
     ["¿El examen de práctica es gratis?", "Sí, todo el contenido de Brevete Perú es completamente gratuito: modo estudio, simulacros de examen y refuerzo de fallos."],
-    ["¿De dónde salen las preguntas del examen de brevete?", "Las preguntas provienen del balotario oficial publicado por el Ministerio de Transportes y Comunicaciones (MTC) del Perú, verificadas pregunta por pregunta contra el documento original."],
+    ["¿De dónde salen las preguntas del examen de brevete?", `Las preguntas provienen del balotario oficial publicado por el Ministerio de Transportes y Comunicaciones (MTC) del Perú (<a href="https://www.gob.pe/institucion/mtc/informes-publicaciones/1928110-examen-de-conocimientos-para-postulantes-a-licencias-de-conducir" target="_blank" rel="noopener">ver publicación oficial en gob.pe</a>), verificadas pregunta por pregunta contra el documento original.`],
     ["¿Cuántas preguntas tiene el examen de reglas y cuántas necesito para aprobar?", `El simulacro tiene ${EXAM_SIZE} preguntas al azar, igual que el examen real del MTC, y necesitas ${PASS_SCORE} respuestas correctas para aprobar.`],
     ["¿Para qué categorías de licencia sirve este simulacro?", "Cubre las categorías de licencia Clase A: I, II-A, II-B, III-A, III-B y III-C, cada una con sus preguntas específicas además del banco general de reglas de tránsito."],
   ];
