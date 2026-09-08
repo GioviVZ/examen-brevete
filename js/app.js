@@ -195,7 +195,7 @@ function viewHome(){
       <span class="official-kicker">Referencia oficial</span>
       <h2 id="official-reference-title">Simulacro de Examen de Conocimientos del MTC</h2>
       <p>Contrasta tu preparación en el portal del Ministerio de Transportes y Comunicaciones. Su simulacro oficial contiene 40 preguntas y requiere 35 respuestas correctas para aprobar.</p>
-      <p class="official-disclaimer">Brevete Perú es una herramienta gratuita e independiente; no reemplaza al portal oficial ni está afiliada al MTC.</p>
+      <p class="official-disclaimer">Brevete Perú es una herramienta gratuita e independiente; no reemplaza al portal oficial ni está afiliada al MTC. Nuestro banco de preguntas se mantiene actualizado según el <a href="https://www.gob.pe/institucion/mtc/informes-publicaciones/1928110-examen-de-conocimientos-para-postulantes-a-licencias-de-conducir" target="_blank" rel="noopener noreferrer">balotario oficial publicado en gob.pe</a>.</p>
     </div>
     <a class="official-link" href="https://sierdgtt.mtc.gob.pe/" target="_blank" rel="noopener noreferrer">
       Visitar simulacro oficial
