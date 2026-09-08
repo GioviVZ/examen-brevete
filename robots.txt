@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://giovivz.github.io/examen-brevete/sitemap.xml
+Sitemap: https://examenbrevetesperu.com/sitemap.xml

@@ -13,10 +13,10 @@ de configuración contra servapp por SSH:
 ```bash
 git clone https://github.com/GioviVZ/examen-brevete.git
 cd examen-brevete
-ssh giovanni@10.0.10.11 'bash -s' < deploy/setup-servapp.sh
+ssh serapp 'bash -s' < deploy/setup-servapp.sh
 ```
 
-Esto crea `~/sites/examenbrevete` en servapp y un bloque de Nginx
+Esto crea `/var/www/examenbrevete` en servapp y un bloque de Nginx
 escuchando en el puerto `8090` (dedicado, para no interferir con lo que
 ya haya en el puerto 80). Ajusta `PORT` o `DOMAIN` al inicio del script
 si lo necesitas antes de correrlo.
@@ -30,7 +30,7 @@ Cada vez que quieras subir la última versión (por ejemplo tras un
 bash deploy/deploy.sh
 ```
 
-Esto sincroniza los archivos del sitio a `~/sites/examenbrevete` en
+Esto sincroniza los archivos del sitio a `/var/www/examenbrevete` en
 servapp vía `rsync` sobre SSH. No requiere privilegios de root (el
 bloque de Nginx ya apunta ahí desde el paso 1).
 
@@ -44,5 +44,5 @@ desde el dominio público.
 ## Verificar
 
 ```bash
-ssh giovanni@10.0.10.11 'curl -I http://127.0.0.1:8090'
+ssh serapp 'curl -I http://127.0.0.1:8090'
 ```

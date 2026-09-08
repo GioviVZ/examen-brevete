@@ -4,11 +4,12 @@
 # Uso: bash deploy/deploy.sh
 set -euo pipefail
 
-HOST="giovanni@10.0.10.11"
-DEST="~/sites/examenbrevete"
+HOST="${DEPLOY_HOST:-serapp}"
+DEST="/var/www/examenbrevete"
 
 rsync -av --delete \
   --exclude '.git' \
+  --exclude '.gitignore' \
   --exclude '.github' \
   --exclude 'deploy' \
   --exclude 'node_modules' \
