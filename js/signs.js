@@ -52,7 +52,7 @@ const ICONS = {
   "arrow-left": (c)=>arrow(50,50,26,180,9,c),
   "arrow-right": (c)=>arrow(50,50,26,0,9,c),
   "u-turn": (c)=>`<path d="M62 72 V40 a18 18 0 0 0-36 0 V60" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round"/>${arrow(26,60,0,0,0,c)}<path d="M26 60 L14 48 M26 60 L38 48" stroke="${c}" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
-  "no-left-turn": (c)=>`<path d="M70 70 V45 a20 20 0 0 0-20-20 H32" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round"/><path d="M32 25 L20 25 L32 38 Z" fill="${c}"/>`,
+  "no-left-turn": (c)=>`<path d="M62 68 V46 a10 10 0 0 0-10-10 H34" fill="none" stroke="${c}" stroke-width="12" stroke-linecap="square"/><path d="M34 27 L20 36 L34 45 Z" fill="${c}"/>`,
   "cross": (c)=>`<path d="M32 32 L68 68 M68 32 L32 68" stroke="${SIGN_COLORS.red}" stroke-width="10" stroke-linecap="round"/>`,
   "horn-slash": (c)=>`<path d="M30 42 h14 l16-14 v44 l-16-14 h-14 z" fill="${c}"/><path d="M64 40 q8 10 0 20" stroke="${c}" stroke-width="5" fill="none" stroke-linecap="round"/>`,
   "car-silhouette": (c)=>`<path d="M22 60 q2-16 12-18 h32 q10 2 12 18 z" fill="${c}"/><circle cx="32" cy="62" r="6" fill="#fff"/><circle cx="68" cy="62" r="6" fill="#fff"/>`,
@@ -130,6 +130,17 @@ function frameCirclePro(inner, big=false){
     <g>${inner("#111")}</g>
   </svg>`;
 }
+// Tablero cuadrado blanco con borde negro + círculo rojo tachado (barra diagonal),
+// tal como las señales R reglamentarias de prohibición en el manual peruano (ej. R-6).
+function frameProhSquare(inner, big=false){
+  const s = big?110:96;
+  return `<svg viewBox="0 0 100 100" width="${s}" height="${s}">
+    <rect x="4" y="4" width="92" height="92" rx="12" fill="#fff" stroke="#111" stroke-width="7"/>
+    <circle cx="50" cy="50" r="33" fill="none" stroke="${SIGN_COLORS.red}" stroke-width="8.5"/>
+    <g>${inner("#111")}</g>
+    <rect x="12" y="45.5" width="76" height="9" rx="4.5" fill="${SIGN_COLORS.red}" transform="rotate(-45 50 50)"/>
+  </svg>`;
+}
 function frameCircleFilled(inner, big=false, fillColor=SIGN_COLORS.red){
   const s = big?110:96;
   return `<svg viewBox="0 0 100 100" width="${s}" height="${s}">
@@ -161,7 +172,7 @@ function frameRectSpecial(content, big=false){
 
 // code -> {frame, icon, extra}
 const SIGN_DB = {
-  "R-6": {frame:"proh", icon:"no-left-turn"},
+  "R-6": {frame:"prohSquare", icon:"no-left-turn"},
   "R-3": {frame:"proh", icon:"arrow-up"},
   "R-53": {frame:"proh", icon:"cross"},
   "R-29": {frame:"proh", icon:"horn-slash"},
@@ -233,6 +244,7 @@ function renderSignSVG(code, big=false){
   if (d.frame === "prev") return frameDiamond(ICONS[d.icon], big);
   if (d.frame === "triText") return frameTriangleText(d.text, big);
   if (d.frame === "proh") return frameCirclePro(ICONS[d.icon], big);
+  if (d.frame === "prohSquare") return frameProhSquare(ICONS[d.icon], big);
   if (d.frame === "mand") return frameCircleFilled(ICONS[d.icon], big);
   if (d.frame === "info") return frameInfo(ICONS[d.icon], big);
   if (d.frame === "speed") return frameSpeed(d.num, big) ;
