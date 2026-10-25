@@ -2,7 +2,7 @@
 // App shell (HTML/CSS/JS) precacheado; imágenes de señales y rótulos se
 // cachean sobre la marcha la primera vez que se ven, así no hace falta
 // mantener aquí una lista manual de cada archivo de assets/.
-const CACHE_VERSION = "brevete-v3";
+const CACHE_VERSION = "brevete-v4";
 const SHELL_ASSETS = [
   "index.html",
   "css/style.css",
@@ -13,6 +13,8 @@ const SHELL_ASSETS = [
   "js/data-3a.js",
   "js/data-3b.js",
   "js/data-3c.js",
+  "js/data-b.js",
+  "js/data-b2c.js",
   "js/signs.js",
   "js/srs.js",
   "js/app.js",

@@ -391,6 +391,45 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
     await expect(page.locator('.chip[data-arg="3c"]')).toHaveClass(/active/);
   });
 
+  test('categorías de Clase B (motos) tienen su propio banco y persisten tras recargar', async ({ page }) => {
+    await page.goto('/index.html');
+
+    await page.click('[data-action="set-category"][data-arg="b2b"]');
+    await expect(page.locator('.brand-sub')).toHaveText('Clase B · Categoría II-B (motos lineales)');
+    const totalB2B = await page.locator('.hero-stat .big').nth(2).textContent();
+    expect(totalB2B).toContain('/201');
+
+    await page.click('[data-action="set-category"][data-arg="b2c"]');
+    await expect(page.locator('.brand-sub')).toHaveText('Clase B · Categoría II-C (mototaxis)');
+    const totalB2C = await page.locator('.hero-stat .big').nth(2).textContent();
+    expect(totalB2C).toContain('/240');
+
+    await page.reload();
+    await expect(page.locator('.brand-sub')).toHaveText('Clase B · Categoría II-C (mototaxis)');
+    await expect(page.locator('.chip[data-arg="b2c"]')).toHaveClass(/active/);
+  });
+
+  test('las preguntas con fundamento legal (Clase B) lo muestran en la retroalimentación', async ({ page }) => {
+    await page.goto('/index.html');
+    await page.click('[data-action="set-category"][data-arg="b2b"]');
+    await page.click('[data-nav="study-setup"]');
+    await page.click('.chip-group[data-group="count"] .chip[data-val="9999"]');
+    await page.click('[data-action="start-study"]');
+
+    let found = false;
+    for (let i = 0; i < 201 && !found; i++) {
+      await page.locator('.opt-btn').first().click();
+      if (await page.locator('.fundamento-note').count()) {
+        found = true;
+        await expect(page.locator('.fundamento-note')).toContainText('Fundamento legal:');
+        break;
+      }
+      const nextBtn = page.locator('[data-action="next-question"]');
+      if (await nextBtn.count()) await nextBtn.click();
+    }
+    expect(found).toBe(true);
+  });
+
   test('preguntas de rótulos de mercancías peligrosas (III-C) muestran imágenes como alternativas', async ({ page }) => {
     await page.goto('/index.html');
     await page.click('[data-action="set-category"][data-arg="3c"]');

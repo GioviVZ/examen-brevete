@@ -278,6 +278,11 @@ h1,h2,h3,
 .feedback.ok{background:rgba(26,158,92,.12); color:var(--success);}
 .feedback.bad{background:rgba(208,36,42,.1); color:var(--danger);}
 .correct-note{flex-basis:100%; margin-top:6px; font-weight:500; color:var(--text); font-size:13.5px;}
+.fundamento-note{
+  flex-basis:100%; margin-top:8px; padding-top:8px; border-top:1px dashed var(--border);
+  font-weight:400; color:var(--muted); font-size:12.5px; line-height:1.5;
+}
+.fundamento-note strong{color:var(--text); font-weight:700;}
 
 .run-footer{display:flex; justify-content:flex-end; align-items:center; gap:10px;}
 .exam-footer{justify-content:space-between; flex-wrap:wrap;}
