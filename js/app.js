@@ -193,6 +193,7 @@ function viewHome(){
       <p>Revisa tu progreso, tus temas débiles y el historial de tus simulacros.</p>
     </div>
   </section>
+  <a class="resource-link" href="senales-transito.html">${ICON.book} Catálogo completo de señales de tránsito con significado →</a>
   <section class="official-reference" aria-labelledby="official-reference-title">
     <div class="official-reference-copy">
       <span class="official-kicker">Referencia oficial</span>

@@ -72,6 +72,7 @@ h1,h2,h3,
 .navbtn{
   border:none; background:transparent; color:var(--muted); font-weight:600;
   padding:9px 14px; border-radius:10px; font-size:14px; transition:.15s;
+  text-decoration:none; display:inline-block;
 }
 .navbtn:hover{background:var(--bg);}
 .navbtn.active{background:var(--primary); color:#fff;}
@@ -137,6 +138,14 @@ h1,h2,h3,
 .action-card h3{margin:0 0 6px; font-size:17px;}
 .action-card p{margin:0; color:var(--muted); font-size:13.5px; line-height:1.4;}
 .badge{background:var(--warning); color:#fff; border-radius:999px; padding:2px 8px; font-size:11.5px; font-weight:700;}
+
+.resource-link{
+  display:flex; align-items:center; gap:10px; margin-top:14px; padding:12px 16px;
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+  color:var(--text); font-weight:700; font-size:13.5px; text-decoration:none; transition:border-color .15s, background .15s;
+}
+.resource-link svg{flex:0 0 auto; color:var(--primary); width:20px; height:20px;}
+.resource-link:hover{border-color:var(--primary); background:var(--bg);}
 
 .official-reference{
   display:flex; align-items:center; justify-content:space-between; gap:18px;
@@ -450,4 +459,37 @@ h3{margin:26px 0 12px; font-size:16px;}
   .hero-stats{gap:16px;}
   .mainnav{width:100%; justify-content:space-between;}
   .navbtn{padding:8px 8px; font-size:12.5px;}
+}
+
+/* PÁGINAS DE CONTENIDO (SEO) */
+.content-page{max-width:880px;}
+.content-page h1{font-size:28px; line-height:1.25; margin:4px 0 14px;}
+.content-page h2{font-size:21px; margin:34px 0 12px;}
+.content-page p{line-height:1.65; color:var(--text); font-size:15px;}
+.content-page ul{line-height:1.7; color:var(--text); font-size:15px; padding-left:22px;}
+.content-page li{margin-bottom:6px;}
+.content-lede{font-size:16.5px; color:var(--muted); margin-bottom:20px;}
+.breadcrumb{font-size:12.5px; color:var(--muted); margin:18px 0; display:flex; gap:6px; align-items:center;}
+.breadcrumb a{color:var(--muted); text-decoration:none;}
+.breadcrumb a:hover{color:var(--primary); text-decoration:underline;}
+.content-cta{text-align:center; margin:26px 0;}
+.content-cta .btn-primary{text-decoration:none; display:inline-flex; width:auto; max-width:360px; margin:0 auto;}
+
+.sign-type-section{margin-top:30px;}
+.sign-type-count{color:var(--muted); font-weight:600; font-size:15px;}
+.sign-type-desc{color:var(--muted); font-size:14px; margin:0 0 16px;}
+.sign-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;}
+.sign-card{
+  display:flex; gap:12px; align-items:center; background:var(--card); border:1px solid var(--border);
+  border-radius:12px; padding:10px 12px;
+}
+.sign-card-img{flex:0 0 auto; width:56px; height:56px; display:flex; align-items:center; justify-content:center;}
+.sign-card-img img, .sign-card-img svg{max-width:100%; max-height:100%;}
+.sign-card-body{min-width:0;}
+.sign-card-code{display:block; font-weight:800; color:var(--primary); font-size:12.5px; letter-spacing:.03em; margin-bottom:2px;}
+.sign-card-body p{margin:0; font-size:12.5px; line-height:1.4; color:var(--muted);}
+
+@media (max-width:520px){
+  .content-page h1{font-size:23px;}
+  .sign-grid{grid-template-columns:1fr 1fr;}
 }

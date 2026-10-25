@@ -517,4 +517,43 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
     const saved = await page.evaluate(() => localStorage.getItem('brevete_session'));
     expect(saved).toBeNull();
   });
+
+  test('el catálogo de señales carga sin errores, enlaza al simulador y se linkea desde el inicio', async ({ page }) => {
+    const consoleErrors = [];
+    page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+    page.on('pageerror', err => consoleErrors.push(err.message));
+
+    // enlace visible desde el inicio
+    await page.goto('/index.html');
+    const resourceLink = page.locator('.resource-link');
+    await expect(resourceLink).toBeVisible();
+    await expect(resourceLink).toHaveAttribute('href', 'senales-transito.html');
+
+    await page.goto('/senales-transito.html');
+    await expect(page).toHaveTitle(/Señales de Tránsito/);
+    await expect(page.locator('h1')).toContainText('Señales de Tránsito');
+    const cards = page.locator('.sign-card');
+    await expect(cards).toHaveCount(58);
+
+    // las tres secciones por tipo están presentes
+    await expect(page.locator('#R-heading')).toContainText('Reglamentarias');
+    await expect(page.locator('#P-heading')).toContainText('Preventivas');
+    await expect(page.locator('#I-heading')).toContainText('Informativas');
+
+    // todas las imágenes cargan (recorre lazy-load bajando por la página)
+    for (let i = 0; i < 6; i++) {
+      await page.mouse.wheel(0, 1200);
+      await page.waitForTimeout(150);
+    }
+    const brokenImgs = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('.sign-card-img img')).filter(i => !i.complete || i.naturalWidth === 0).map(i => i.src)
+    );
+    expect(brokenImgs).toEqual([]);
+
+    // el botón vuelve al simulador
+    await page.locator('.content-cta .btn-primary').first().click();
+    await expect(page).toHaveURL(/index\.html/);
+
+    expect(consoleErrors).toEqual([]);
+  });
 });
