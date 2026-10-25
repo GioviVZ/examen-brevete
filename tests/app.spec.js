@@ -394,6 +394,11 @@ test.describe('Brevete Perú - Examen de Reglas', () => {
   test('categorías de Clase B (motos) tienen su propio banco y persisten tras recargar', async ({ page }) => {
     await page.goto('/index.html');
 
+    await page.click('[data-action="set-category"][data-arg="b2a"]');
+    await expect(page.locator('.brand-sub')).toHaveText('Clase B · Categoría II-A (bicimotos hasta 50cc)');
+    const totalB2A = await page.locator('.hero-stat .big').nth(2).textContent();
+    expect(totalB2A).toContain('/201');
+
     await page.click('[data-action="set-category"][data-arg="b2b"]');
     await expect(page.locator('.brand-sub')).toHaveText('Clase B · Categoría II-B (motos lineales)');
     const totalB2B = await page.locator('.hero-stat .big').nth(2).textContent();

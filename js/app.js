@@ -8,6 +8,7 @@ const CATEGORIES = {
   "3a": { label: "Categoría III-A", sub: "Clase A · Categoría III-A", questions: QUESTIONS.concat(typeof ESPECIFICAS_3A !== "undefined" ? ESPECIFICAS_3A : []) },
   "3b": { label: "Categoría III-B", sub: "Clase A · Categoría III-B", questions: QUESTIONS.concat(typeof ESPECIFICAS_3B !== "undefined" ? ESPECIFICAS_3B : []) },
   "3c": { label: "Categoría III-C", sub: "Clase A · Categoría III-C", questions: QUESTIONS.concat(typeof ESPECIFICAS_3C !== "undefined" ? ESPECIFICAS_3C : []) },
+  "b2a": { label: "Categoría II-A (Bicimoto)", sub: "Clase B · Categoría II-A (bicimotos hasta 50cc)", questions: typeof QUESTIONS_B !== "undefined" ? QUESTIONS_B : [] },
   "b2b": { label: "Categoría II-B (Moto)",     sub: "Clase B · Categoría II-B (motos lineales)", questions: typeof QUESTIONS_B !== "undefined" ? QUESTIONS_B : [] },
   "b2c": { label: "Categoría II-C (Mototaxi)", sub: "Clase B · Categoría II-C (mototaxis)",      questions: (typeof QUESTIONS_B !== "undefined" ? QUESTIONS_B : []).concat(typeof ESPECIFICAS_B2C !== "undefined" ? ESPECIFICAS_B2C : []) },
 };
@@ -212,7 +213,7 @@ function homeFaq(){
     ["¿El examen de práctica es gratis?", "Sí, todo el contenido de Brevete Perú es completamente gratuito: modo estudio, simulacros de examen y refuerzo de fallos."],
     ["¿De dónde salen las preguntas del examen de brevete?", `Las preguntas provienen del balotario oficial publicado por el Ministerio de Transportes y Comunicaciones (MTC) del Perú (<a href="https://www.gob.pe/institucion/mtc/informes-publicaciones/1928110-examen-de-conocimientos-para-postulantes-a-licencias-de-conducir" target="_blank" rel="noopener">ver publicación oficial en gob.pe</a>), verificadas pregunta por pregunta contra el documento original.`],
     ["¿Cuántas preguntas tiene el examen de reglas y cuántas necesito para aprobar?", `El simulacro tiene ${EXAM_SIZE} preguntas al azar y necesitas ${PASS_SCORE} respuestas correctas para aprobar, de acuerdo con la información publicada por el MTC.`],
-    ["¿Para qué categorías de licencia sirve este simulacro?", "Cubre las categorías de licencia Clase A: I, II-A, II-B, III-A, III-B y III-C; y de Clase B (motos): II-B y II-C. Cada una con sus preguntas específicas además del banco general correspondiente."],
+    ["¿Para qué categorías de licencia sirve este simulacro?", "Cubre las categorías de licencia Clase A: I, II-A, II-B, III-A, III-B y III-C; y de Clase B (motos): II-A, II-B y II-C. Cada una con sus preguntas específicas además del banco general correspondiente."],
     ["¿Dónde encuentro el simulacro oficial del MTC?", `Puedes acceder al <a href="https://sierdgtt.mtc.gob.pe/" target="_blank" rel="noopener noreferrer">Simulacro de Examen de Conocimientos del MTC</a>. Brevete Perú es una herramienta de práctica independiente y no reemplaza el portal del Ministerio.`],
   ];
   return `
